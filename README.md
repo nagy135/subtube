@@ -15,6 +15,12 @@ This project has couple of dependecies you have to have. If you use arch or almo
 
 First 2 are core, while latter 3 will be optional in future. As of now, you need all of them.
 
+## ARCH
+```
+pip install --user youtube-dl
+sudo pacman -S sxiv, mpv, youtube-viewer, dunst
+```
+
 # INSTALL
 
 ```
