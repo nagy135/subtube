@@ -43,7 +43,7 @@ provides CLI interface via subtube
 ```
 subtube command
 ```
-if ran without command, help is shown
+if ran without command, help is shown. Bind commands to key presses in key handler of your choice. I prefer **super+y** to launch **subtube play** and **super+shift+y** as my **subtube update** launcher.
 
 ## COMMANDS
 
