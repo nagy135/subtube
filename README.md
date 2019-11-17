@@ -32,12 +32,18 @@ sudo ./install.sh --remove
 
 # USAGE
 
-Run subtube to see help.
+provides CLI interface via subtube
+```
+subtube command
+```
+if ran without command, help is shown
 
-## init
+## COMMANDS
+
+### init
 starts initial update, fills seen database without actually downloading thumbnails (update would download 5 latest videos from channels you probably saw)
 
-## update
+### update
 reads subscribe list, downloads the newest 5 videos (if not seen yet) and allows you to play them (with play)
 ```
 subtube update
@@ -48,13 +54,13 @@ subtube secret_update
 ```
 to avoid notification (I use it with crontab 30 min interval)
 
-## play
+### play
 brings up sxiv thumbnail selection, where (default sxiv bindings) **m** marks thumbnail and **q** closes it and starts playing all of marked videos (if any).
 ```
 subtube play
 ```
 
-## add
+### add
 adds new subscribed channel
 
 ```
@@ -63,14 +69,14 @@ subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
-## queue
+### queue
 this feature is simply to allow you to specify custom order of videos. If you mark videos with **m** they will be played in order they show inside sxiv. Look at **SXIV integration** for more information. Command bellow plays queued videos in your order
 ```
 subtube play_queue
 ```
 
 
-## clean
+### clean
 cleans thumbnails folder
 
 ```
