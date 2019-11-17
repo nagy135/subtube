@@ -50,6 +50,10 @@ if ran without command, help is shown
 ### init
 starts initial update, fills seen database without actually downloading thumbnails (update would download 5 latest videos from channels you probably saw)
 
+```
+subtube init
+```
+
 ### update
 reads subscribe list, downloads the newest 5 videos (if not seen yet) and allows you to play them (with play)
 ```
