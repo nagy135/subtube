@@ -14,4 +14,5 @@ else
     cp subtube $EXECUTABLE_FOLDER/subtube
     chmod +x $EXECUTABLE_FOLDER/subtube
     cp -r resources/* $INSTALL_DIR/resources
+    chmod -R 777 $INSTALL_DIR/resources
 fi
