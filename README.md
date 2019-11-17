@@ -28,9 +28,15 @@ These commands will clone repository and install all the files to **/usr/bin**, 
 Run subtube to see help.
 
 ## update
-```bash
-subtube update # or subtube secret_update to avoid notification (I use it with crontab 30 min interval)
+reads subscribe list, downloads the newest 5 videos (if not seen yet) and allows you to play them (with play)
 ```
+subtube update
+```
+or
+```
+subtube secret_update
+```
+to avoid notification (I use it with crontab 30 min interval)
 
 # DUNST
 
