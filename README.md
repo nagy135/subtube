@@ -24,6 +24,12 @@ sudo ./install.sh
 ```
 These commands will clone repository and install all the files to **/usr/bin**, **/usr/local/share**
 
+## UNINSTALL
+removes all files created
+```
+sudo ./install.sh --remove
+```
+
 # USAGE
 
 Run subtube to see help.
