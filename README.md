@@ -21,7 +21,16 @@ git clone https://github.com/nagy135/subtube
 cd subtube
 sudo ./install.sh
 ```
-These commands will clone repository and install all the files to */usr/bin*, */usr/local/share*
+These commands will clone repository and install all the files to **/usr/bin**, **/usr/local/share**
+
+# USAGE
+
+Run subtube to see help.
+
+## update
+```
+subtube update # or subtube secret_update to avoid notification (I use it with crontab 30 min interval)
+```
 
 # DUNST
 
