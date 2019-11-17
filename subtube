@@ -1,8 +1,16 @@
 #!/bin/bash
 
+SEEN=/usr/local/share/subtube/resources/seen.lst
+SUBSCRIBES=/usr/local/share/subtube/resources/subscribes
+SUBTUBE_QUEUE=/usr/local/share/subtube/resources/subtube_queue
+SUBTUBE_TITLE=/usr/local/share/subtube/resources/subtube_title.db
+PLAYING_ICON=/usr/local/share/subtube/resources/subtube-playing.png
+YOUTUBE_ICON=/usr/local/share/subtube/resources/subtube_youtube.png
+THUMBNAILS=/usr/local/share/subtube/resources/thumbnails
+NAMES=/usr/local/share/subtube/resources/subscribes_names
+
 thumbnail(){
-    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O ~/.scripts/resources/thumbnails/$1.jpg
-    # title=$(wget --quiet -O - "https://www.youtube.com/watch?v=$2" | paste -s -d " " | sed -e 's!.*<head>\(.*\)</head>.*!\1!' | sed -e 's!.*<title>\(.*\)</title>.*!\1!' | sed 's/\s*-\s*YouTube//')
+    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
 }
 
 viewer(){
@@ -43,7 +51,7 @@ update(){
     fi
     i=0
     sub_i=0
-    subcount=$(cat ~/.scripts/resources/subscribes | wc -l)
+    subcount=$(cat $SUBSCRIBES | wc -l)
     while read line; do
         sub_i=$((sub_i+1))
         if [[ $1 != "secret" ]]; then
@@ -51,7 +59,7 @@ update(){
         fi
         vid_ids=$(wget -qO- $line | grep "ux-thumb-wrap"| head -n 5 | cut -d\" -f4 | cut -d\= -f2)
         while read vid_id; do
-            if [[ ! -z $(grep -e "^$vid_id$" ~/.scripts/resources/seen.lst) ]]; then
+            if [[ ! -z $(grep -e "^$vid_id$" $SEEN) ]]; then
                 continue
             else
                 [[ -z "$vid_id" ]] && continue
@@ -59,33 +67,31 @@ update(){
                     thumbnail $vid_id
                 fi
                 title=$(wget --quiet -O - "https://www.youtube.com/watch?v=$vid_id" | paste -s -d " " | sed -e 's!.*<head>\(.*\)</head>.*!\1!' | sed -e 's!.*<title>\(.*\)</title>.*!\1!' | sed 's/\s*-\s*YouTube//' | perl -MHTML::Entities -pe 'decode_entities($_);')
-                # echo "$vid_id $title" >> ~/.scripts/resources/subtube_title.db
-                echo $vid_id >> ~/.scripts/resources/seen.lst
-                notify-send -i 'none' -t 3000 "SUBTUBE" "$title" -u critical -i ~/.scripts/resources/thumbnails/$vid_id.jpg
+                echo $vid_id >> $SEEN
+                notify-send -i 'none' -t 3000 "SUBTUBE" "$title" -u critical -i $THUMBNAILS/$vid_id.jpg
             fi
         done <<< "$vid_ids"
-    done < ~/.scripts/resources/subscribes
+    done < $SUBSCRIBES
     sleep 2
     if [[ $1 != "secret" ]]; then
-        notify-send -i 'none' -t 3000 "SUBTUBE" "$(find ~/.scripts/resources/thumbnails/* | wc -l) unseen video(s)"
+        notify-send -i 'none' -t 3000 "SUBTUBE" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
     fi
     rm /tmp/subtube_update.pid
 }
 
 pick_thumbnails(){
     bspc rule -a Sxiv --one-shot sticky=on state=floating rectangle=800x500+560+250
-    if [[ $(ls ~/.scripts/resources/thumbnails/ | wc -l) -gt 16 ]]; then
+    if [[ $(ls $THUMBNAILS | wc -l) -gt 16 ]]; then
         notify-send -t 4000 -i 'none' -u low "Warning" "Thumbnails do not fit in sxiv"
     fi
-    chosen=$(sxiv -tbo ~/.scripts/resources/thumbnails || notify-send -i 'none' -t 3000 "SubTube" "No videos to play")
-    lego_refresh "subtube" &
+    chosen=$(sxiv -tbo $THUMBNAILS || notify-send -i 'none' -t 3000 "SubTube" "No videos to play")
     if [[ ! -z $chosen ]]; then
         num=$(echo "$chosen" | wc -l)
         i=1
         while read choice; do
-            id=$(echo "$choice" | sed 's/\/home\/infiniter\/.scripts\/resources\/thumbnails\/\([^.]\+\)\.jpg/\1/')
+            id=$(echo "$choice" | sed "s/\/usr\/local\/share\/subtube\/resources\/thumbnails\/\([^.]\+\)\.jpg/\1/")
             rm $choice
-            sed -i "/$id/d" ~/.scripts/resources/subtube_title.db
+            sed -i "/$id/d" $SUBTUBE_TITLE
             if [[ $1 == "remove" ]]; then
                 notify_name "Removing" $id
             else
@@ -95,10 +101,8 @@ pick_thumbnails(){
                     notify_name "Playing $i/$num" $id
                     i=$((i+1))
                 fi
-                # lego_refresh "subtube" &
                 url="https://www.youtube.com/watch?v=$id"
-                TITLE=$(wget --quiet -O - $url\
-                    | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
+                TITLE=$(wget --quiet -O - $url | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
                 echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
                 youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
             fi
@@ -107,16 +111,16 @@ pick_thumbnails(){
 }
 
 pick_rofi(){
-    if [[ $(cat ~/.scripts/resources/subtube_title.db | wc -l) -eq 0 ]]; then
+    if [[ $(cat $SUBTUBE_TITLE | wc -l) -eq 0 ]]; then
         notify-send -i 'none' -t 3000 "SubTube" "Nothing to watch"
     fi
-    chosen=$(cat ~/.scripts/resources/subtube_title.db | sed 's/^[^\ ]*\ *//'| rofi -dmenu -p "Subtube videos" || notify-send -i 'none' -t 3000 "SubTube" "No videos chosen")
+    chosen=$(cat $SUBTUBE_TITLE | sed 's/^[^\ ]*\ *//'| rofi -dmenu -p "Subtube videos" || notify-send -i 'none' -t 3000 "SubTube" "No videos chosen")
     if [[ ! -z $chosen ]]; then
         while read choice; do
-            id=$(cat ~/.scripts/resources/subtube_title.db | sed -n "/$chosen/p" | awk '{print $1}')
+            id=$(cat $SUBTUBE_TITLE | sed -n "/$chosen/p" | awk '{print $1}')
             if [[ ! -z $id ]]; then
-                sed -i "/$id/d" ~/.scripts/resources/subtube_title.db
-                rm ~/.scripts/resources/thumbnails/$id.jpg
+                sed -i "/$id/d" $SUBTUBE_TITLE
+                rm $THUMBNAILS/$id.jpg
             else
                 exit 1
             fi
@@ -125,8 +129,7 @@ pick_rofi(){
             else
                 notify_name "Playing" $id
                 url="https://www.youtube.com/watch?v=$id"
-                echo "url" $url
-                TITLE=$(cat ~/.scripts/resources/subtube_title.db | grep $id | awk '{print $2}')
+                TITLE=$(cat $SUBTUBE_TITLE | grep $id | awk '{print $2}')
                 echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
                 youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
             fi
@@ -135,7 +138,6 @@ pick_rofi(){
 }
 
 clean(){
-    # echo -en "" > ~/.scripts/resources/seen.lst
     rm ~/.scripts/resources/thumbnails/*
 }
 
@@ -147,22 +149,22 @@ name(){
 
 add_queue(){
     cutted=$(echo "$1" | sed 's/.*\/\([^.]*\)\.jpg/\1/')
-    echo "$cutted" >> ~/.scripts/resources/subtube_queue
+    echo "$cutted" >> $SUBTUBE_QUEUE
     lego_refresh "subtube"
 }
 
 play_queue(){
-    len=$(cat ~/.scripts/resources/subtube_queue | wc -l)
+    len=$(cat $SUBTUBE_QUEUE | wc -l)
     if [[ $len -eq 0 ]]; then
         notify-send -i 'none' "Queue" "nothing to play"
         exit 0
     fi
     for i in $(seq 1 $len); do
-        id=$(sed -n "1p" ~/.scripts/resources/subtube_queue)
+        id=$(sed -n "1p" $SUBTUBE_QUEUE)
         url="https://www.youtube.com/watch?v=$id"
         TITLE=$(wget --quiet -O - $url\
             | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
-        sed -i '1d' ~/.scripts/resources/subtube_queue
+        sed -i '1d' $SUBTUBE_QUEUE
         lego_refresh "subtube"
         echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
         notify-send -i 'none' "Queue playing" "$TITLE"
@@ -173,7 +175,7 @@ play_queue(){
 notify_name(){
     title=$(wget --quiet -O - "https://www.youtube.com/watch?v=$2" | paste -s -d " " | sed -e 's!.*<head>\(.*\)</head>.*!\1!' | sed -e 's!.*<title>\(.*\)</title>.*!\1!' | sed 's/\s*-\s*YouTube//')
     if [[ $1 == "Playing" ]]; then
-        notify-send -i ~/.scripts/resources/subtube-playing.png -t 4000 "$1" "$title"
+        notify-send -i $PLAYING_ICON -t 4000 "$1" "$title"
     else
         notify-send -i 'none' -t 4000 "$1" "$title"
     fi
@@ -181,8 +183,8 @@ notify_name(){
 }
 
 list(){
-    subs=$(cat ~/.scripts/resources/subscribes | wc -l)
-    subs_names=$(cat ~/.scripts/resources/subscribes_names | wc -l)
+    subs=$(cat $SUBSCRIBES | wc -l)
+    subs_names=$(cat $NAMES | wc -l)
     i=0
     if [[ ! $subs -eq $subs_names ]]; then
         while read sub; do
@@ -191,10 +193,10 @@ list(){
                 continue
             fi
             name=$(wget --quiet -O - "$sub" | sed -n '/og\:title/p' | sed 's/.*content="\([^"]\+\).*/\1/')
-            echo $name >> ~/.scripts/resources/subscribes_names
-        done < ~/.scripts/resources/subscribes
+            echo $name >> $NAMES
+        done < $SUBSCRIBES
     fi
-    cat ~/.scripts/resources/subscribes_names
+    cat $NAMES
 }
 
 if [[ $1 == 'update' ]]; then
@@ -220,7 +222,7 @@ elif [[ $1 == 'clean' ]]; then
 elif [[ $1 == 'name' ]]; then
     name $2
 elif [[ $1 == 'add' ]]; then
-    echo $2 >> ~/.scripts/resources/subscribes
+    echo $2 >> $SUBSCRIBES
 elif [[ $1 == 'list' ]]; then
     list
 else
