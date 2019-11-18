@@ -150,3 +150,9 @@ Put this block to your dunst config to avoid notification spam of update progres
     summary = *SUBTUBE - Update*
     set_stack_tag = 55
 ```
+
+# FUTURE WORK
+* create makefile instead of install script to provide flexibility amongs different distros
+* make youtube-viewer optional dependency (run pure youtube-dl if needed)
+* fix rofi_play, to allow to play video via it's title, not just thumbnail
+* provide setup for crontab, auto secret_update
