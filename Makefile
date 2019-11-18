@@ -8,7 +8,7 @@ install:
 	chmod +x $(PREFIX)/bin/subtube
 	mkdir -p $(PREFIX)/share/subtube
 	cp -R resources $(PREFIX)/share/subtube
-	chmod 755 -R $(PREFIX)/share/subtube
+	chmod 777 -R $(PREFIX)/share/subtube
 
 uninstall:
 	rm $(PREFIX)/bin/subtube
