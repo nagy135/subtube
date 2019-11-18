@@ -1,13 +1,15 @@
 #!/bin/bash
 
-SEEN=/usr/local/share/subtube/resources/seen.lst
-SUBSCRIBES=/usr/local/share/subtube/resources/subscribes
-SUBTUBE_QUEUE=/usr/local/share/subtube/resources/subtube_queue
-SUBTUBE_TITLE=/usr/local/share/subtube/resources/subtube_title.db
-PLAYING_ICON=/usr/local/share/subtube/resources/subtube-playing.png
-YOUTUBE_ICON=/usr/local/share/subtube/resources/subtube_youtube.png
-THUMBNAILS=/usr/local/share/subtube/resources/thumbnails
-NAMES=/usr/local/share/subtube/resources/subscribes_names
+PREFIX=/usr/share
+
+SEEN=$PREFIX/subtube/resources/seen.lst
+SUBSCRIBES=$PREFIX/subtube/resources/subscribes
+SUBTUBE_QUEUE=$PREFIX/subtube/resources/subtube_queue
+SUBTUBE_TITLE=$PREFIX/subtube/resources/subtube_title.db
+PLAYING_ICON=$PREFIX/subtube/resources/subtube-playing.png
+YOUTUBE_ICON=$PREFIX/subtube/resources/subtube_youtube.png
+THUMBNAILS=$PREFIX/subtube/resources/thumbnails
+NAMES=$PREFIX/subtube/resources/subscribes_names
 
 thumbnail(){
     wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
@@ -111,6 +113,8 @@ pick_thumbnails(){
 }
 
 pick_rofi(){
+    echo "NotImplementedError"
+    exit 1
     if [[ $(cat $SUBTUBE_TITLE | wc -l) -eq 0 ]]; then
         notify-send -i 'none' -t 3000 "SubTube" "Nothing to watch"
     fi
