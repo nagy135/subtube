@@ -29,7 +29,17 @@ sudo pacman -S sxiv, mpv, youtube-viewer, dunst
 pip install --user youtube-dl
 sudo apt install sxiv, mpv, dunst
 ```
-youtube-viewer is not present on debian repo, install from source via link in *dependecies*
+youtube-viewer is not present on debian repo, install from source via link in *dependecies*. Probably all you need is to run this
+
+```
+cd /tmp # or anywhere else if you wish to preserve repository
+git clone https://github.com/trizen/youtube-viewer     
+cd youtube-viewer
+sudo cpan install CPAN ExtUtils::PkgConfig Module::Build inc::latest PAR::Dist Term::ReadLine::Gnu::XS Unicode::GCString LWP::Protocol::https Data::Dump JSON Gtk2 File::ShareDir
+perl Build.PL --gtk
+sudo ./Build installdeps
+sudo ./Build install
+```
 
 # INSTALL
 
