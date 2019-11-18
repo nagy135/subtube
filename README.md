@@ -114,7 +114,7 @@ subtube clean
 ```
 
 # SXIV integration
-if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use qeueu feature, show video title of thumbnail and remove them. This case statement already exists, so just copy 4 lines inside.
+if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use queue feature, show video title of thumbnail and remove them. This case statement already exists, so just copy 4 lines inside.
 
 After install of sxiv, create config folder and key handler script like this
 ```
