@@ -114,7 +114,7 @@ subtube clean
 ```
 
 # SXIV integration
-if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use queue feature, show video title of thumbnail and remove them. This case statement already exists, so just copy 4 lines inside.
+if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use queue feature, you will be able to show video title as notification or remove thumbnails.
 
 After install of sxiv, create config folder and key handler script like this
 ```
@@ -122,7 +122,7 @@ mkdir -p ~/.config/sxiv/exec
 touch ~/.config/sxiv/exec/key-handler
 ```
 
-then add this content to a file
+then add this content to a file  (If this case statement already exists, so just copy 4 lines inside.)
 
 ```
 #!/bin/bash
@@ -139,7 +139,7 @@ then make it executable
 chmod +x ~/.config/sxiv/exec/key-handler
 ```
 
-this allows you to use sxiv prefix (ctrl+x) in combination with key inside quotes to perform aditional actions
+this allows you to use sxiv prefix (ctrl+x) in combination with key inside quotes to perform additional actions
 
 # DUNST
 
@@ -151,8 +151,12 @@ Put this block to your dunst config to avoid notification spam of update progres
     set_stack_tag = 55
 ```
 
+# CRONTAB
+put these lines to you crontab file to download new thumbnails every 10 minutes.
+```
+*/10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube secret_update
+```
+
 # FUTURE WORK
-* create makefile instead of install script to provide flexibility amongs different distros
 * make youtube-viewer optional dependency (run pure youtube-dl if needed)
 * fix rofi_play, to allow to play video via it's title, not just thumbnail
-* provide setup for crontab, auto secret_update
