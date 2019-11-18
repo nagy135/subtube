@@ -46,14 +46,14 @@ sudo ./Build install
 ```
 git clone https://github.com/nagy135/subtube
 cd subtube
-sudo ./install.sh
+sudo make install
 ```
-These commands will clone repository and install all the files to **/usr/bin**, **/usr/local/share**
+These commands will clone repository and install all the files to **/usr/bin**, **/usr/share/subtube**
 
 ## UNINSTALL
 removes all files created
 ```
-sudo ./install.sh --remove
+sudo make uninstall
 ```
 
 # USAGE
