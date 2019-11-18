@@ -14,7 +14,7 @@ This project has couple of dependecies you have to have. If you use arch or almo
 * [dunst](https://github.com/dunst-project/dunst)
 
 First 3 are core, while latter 2 will be optional in future. As of now, you need all of them.
-Youtube viewer provides (in my opinion) faster video loading and seeking and **dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking (usefull to show update progress bar).
+**Youtube-viewer** provides (in my opinion) faster video loading and seeking and **dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking (usefull to show update progress bar).
 
 ## ARCH
 on arch based distro, get dependencies like this
