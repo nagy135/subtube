@@ -7,13 +7,14 @@ Easy to use script that lets you watch your subscribed youtube channels with no 
 
 This project has couple of dependecies you have to have. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
-* sxiv
-* youtube-dl
-* youtube-viewer
-* mpv
-* dunst
+* [sxiv](https://github.com/muennich/sxiv)
+* [youtube-dl](https://github.com/ytdl-org/youtube-dl)
+* [mpv](https://github.com/mpv-player/mpv)
+* [youtube-viewer](https://github.com/trizen/youtube-viewer)
+* [dunst](https://github.com/dunst-project/dunst)
 
-First 2 are core, while latter 3 will be optional in future. As of now, you need all of them.
+First 3 are core, while latter 2 will be optional in future. As of now, you need all of them.
+Youtube viewer provides (in my opinion) faster video loading and seeking and **dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking (usefull to show update progress bar).
 
 ## ARCH
 on arch based distro, get dependencies like this
@@ -21,6 +22,14 @@ on arch based distro, get dependencies like this
 pip install --user youtube-dl
 sudo pacman -S sxiv, mpv, youtube-viewer, dunst
 ```
+
+## DEBIAN/UBUNTU
+
+```
+pip install --user youtube-dl
+sudo apt install sxiv, mpv, dunst
+```
+youtube-viewer is not present on debian repo, install from source via link in *dependecies*
 
 # INSTALL
 
@@ -97,14 +106,29 @@ subtube clean
 # SXIV integration
 if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use qeueu feature, show video title of thumbnail and remove them. This case statement already exists, so just copy 4 lines inside.
 
+After install of sxiv, create config folder and key handler script like this
 ```
-case "$KEY" in
+mkdir -p ~/.config/sxiv/exec
+touch ~/.config/sxiv/exec/key-handler
+```
+
+then add this content to a file 
+
+```
+#!/bin/bash
+
+case "$1" in
     "n")      while read file; do subtube name $file; done ;; # notify video title
     "t")      while read file; do subtube name $file; done ;; # notify video title (alias)
     "q")      while read file; do subtube add_queue $file; rm $file; done ;; # adds video to queue
     "r")      while read file; do rm $file; done ;; # remove thumbnail
 esac
 ```
+then make it executable
+```
+chmod +x ~/.config/sxiv/exec/key-handler
+```
+
 this allows you to use sxiv prefix (ctrl+x) in combination with key inside quotes to perform aditional actions
 
 # DUNST
