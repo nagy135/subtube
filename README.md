@@ -107,7 +107,7 @@ subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
 ### queue
-this feature is simply to allow you to specify custom order of videos. If you mark videos with **m** they will be played in order they show inside sxiv. Look at **SXIV integration** for more information. Command bellow plays queued videos in your order
+this feature is simply to allow you to specify custom order of videos. If you mark videos with **m** they will be played in order they show inside sxiv. Look at **SXIV integration** for more information. Command bellow plays queued videos in your order. You simply run `subtube play`, use sxiv binds (defined bellow, `ctrl+x q`) to "remove" thumbnails from list and close sxiv with `q`. After that just run `subtube play_queue` to play videos in order you specified.
 ```
 subtube play_queue
 ```
