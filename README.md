@@ -69,6 +69,7 @@ Key press | command
 --- | --- 
 super+y | `subtube play`
 super+shift+y | `subtube update`
+super+ctrl+y | `subtube play_queue`
 
 ## COMMANDS
 
