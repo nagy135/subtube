@@ -64,10 +64,16 @@ subtube command
 ```
 if ran without command, help is shown.
 The optimal workflow you should try is to bind commands to key presses in key handler of your choice. I prefer this comfiguration:
-| Key press     | command        |
-| ------------- | -------------- |
-| super+y       | subtube play   |
-| super+shift+y | subtube update |
+
+    | Key press     | command        |
+    | ------------- | -------------- |
+    | super+y       | subtube play   |
+    | super+shift+y | subtube update |
+
+Markdown | Less | Pretty
+--- | --- | ---
+*Still* | `renders` | **nicely**
+1 | 2 | 3
 
 ## COMMANDS
 
