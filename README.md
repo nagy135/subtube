@@ -157,6 +157,9 @@ put these lines to you crontab file to download new thumbnails every 10 minutes.
 */10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube secret_update
 ```
 
+# BSPWM
+i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
+
 # FUTURE WORK
 * make youtube-viewer optional dependency (run pure youtube-dl if needed)
 * fix rofi_play, to allow to play video via it's title, not just thumbnail
