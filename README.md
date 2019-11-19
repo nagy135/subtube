@@ -62,7 +62,12 @@ provides CLI interface via subtube
 ```
 subtube command
 ```
-if ran without command, help is shown. Bind commands to key presses in key handler of your choice. I prefer **super+y** to launch **subtube play** and **super+shift+y** as my **subtube update** launcher.
+if ran without command, help is shown.
+The optimal workflow you should try is to bind commands to key presses in key handler of your choice. I prefer this comfiguration:
+| Key press     | command        |
+| ------------- | -------------- |
+| super+y       | subtube play   |
+| super+shift+y | subtube update |
 
 ## COMMANDS
 
@@ -163,3 +168,4 @@ i m using it on bspwm, so there is "one-shot sticky floating small middle screen
 # FUTURE WORK
 * make youtube-viewer optional dependency (run pure youtube-dl if needed)
 * fix rofi_play, to allow to play video via it's title, not just thumbnail
+* make repo of my "mpv history" script, that can play already played videos via rofi launcher
