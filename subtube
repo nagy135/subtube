@@ -1,15 +1,15 @@
 #!/bin/bash
 
-PREFIX=/usr/share
+PREFIX=/usr/share/subtube/resources
 
-SEEN=$PREFIX/subtube/resources/seen.lst
-SUBSCRIBES=$PREFIX/subtube/resources/subscribes
-SUBTUBE_QUEUE=$PREFIX/subtube/resources/subtube_queue
-SUBTUBE_TITLE=$PREFIX/subtube/resources/subtube_title.db
-PLAYING_ICON=$PREFIX/subtube/resources/subtube-playing.png
-YOUTUBE_ICON=$PREFIX/subtube/resources/subtube_youtube.png
-THUMBNAILS=$PREFIX/subtube/resources/thumbnails
-NAMES=$PREFIX/subtube/resources/subscribes_names
+SEEN=$PREFIX/seen.lst
+SUBSCRIBES=$PREFIX/subscribes
+SUBTUBE_QUEUE=$PREFIX/subtube_queue
+SUBTUBE_TITLE=$PREFIX/subtube_title.db
+PLAYING_ICON=$PREFIX/subtube-playing.png
+YOUTUBE_ICON=$PREFIX/subtube_youtube.png
+THUMBNAILS=$PREFIX/thumbnails
+NAMES=$PREFIX/subscribes_names
 
 thumbnail(){
     wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
