@@ -62,7 +62,14 @@ provides CLI interface via subtube
 ```
 subtube command
 ```
-if ran without command, help is shown. Bind commands to key presses in key handler of your choice. I prefer **super+y** to launch **subtube play** and **super+shift+y** as my **subtube update** launcher.
+if ran without command, help is shown.
+The optimal workflow you should try is to bind commands to key presses in key handler of your choice. I prefer this comfiguration:
+
+Key press | command 
+--- | --- 
+super+y | `subtube play`
+super+shift+y | `subtube update`
+super+ctrl+y | `subtube play_queue`
 
 ## COMMANDS
 
@@ -100,7 +107,7 @@ subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
 ### queue
-this feature is simply to allow you to specify custom order of videos. If you mark videos with **m** they will be played in order they show inside sxiv. Look at **SXIV integration** for more information. Command bellow plays queued videos in your order
+this feature is simply to allow you to specify custom order of videos. If you mark videos with **m** they will be played in order they show inside sxiv. Look at **SXIV integration** for more information. Command bellow plays queued videos in your order. You simply run `subtube play`, use sxiv binds (defined bellow, `ctrl+x q`) to "remove" thumbnails from list and close sxiv with `q`. After that just run `subtube play_queue` to play videos in order you specified.
 ```
 subtube play_queue
 ```
@@ -157,6 +164,10 @@ put these lines to you crontab file to download new thumbnails every 10 minutes.
 */10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube secret_update
 ```
 
+# BSPWM
+i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
+
 # FUTURE WORK
 * make youtube-viewer optional dependency (run pure youtube-dl if needed)
 * fix rofi_play, to allow to play video via it's title, not just thumbnail
+* make repo of my "mpv history" script, that can play already played videos via rofi launcher
