@@ -1,15 +1,15 @@
 #!/bin/bash
 
-PREFIX=/usr/share
+PREFIX=/usr/share/subtube/resources
 
-SEEN=$PREFIX/subtube/resources/seen.lst
-SUBSCRIBES=$PREFIX/subtube/resources/subscribes
-SUBTUBE_QUEUE=$PREFIX/subtube/resources/subtube_queue
-SUBTUBE_TITLE=$PREFIX/subtube/resources/subtube_title.db
-PLAYING_ICON=$PREFIX/subtube/resources/subtube-playing.png
-YOUTUBE_ICON=$PREFIX/subtube/resources/subtube_youtube.png
-THUMBNAILS=$PREFIX/subtube/resources/thumbnails
-NAMES=$PREFIX/subtube/resources/subscribes_names
+SEEN=$PREFIX/seen.lst
+SUBSCRIBES=$PREFIX/subscribes
+SUBTUBE_QUEUE=$PREFIX/subtube_queue
+SUBTUBE_TITLE=$PREFIX/subtube_title.db
+PLAYING_ICON=$PREFIX/subtube-playing.png
+YOUTUBE_ICON=$PREFIX/subtube_youtube.png
+THUMBNAILS=$PREFIX/thumbnails
+NAMES=$PREFIX/subscribes_names
 
 thumbnail(){
     order=$(ls -l $THUMBNAILS | wc -l)
@@ -86,7 +86,7 @@ update(){
 
 pick_thumbnails(){
     [[ $XDG_SESSION_DESKTOP == 'bspwm' ]] && bspc rule -a Sxiv --one-shot sticky=on state=floating rectangle=800x500+560+250
-    if [[ $(ls $THUMBNAILS | wc -l) -gt 16 ]]; then
+    if [[ $(ls $THUMBNAILS | wc -l) -gt 16 ]] && [[ $XDG_SESSION_DESKTOP == 'bspwm' ]]; then
         notify-send -t 4000 -i 'none' -u low "Warning" "Thumbnails do not fit in sxiv"
     fi
     chosen=$(sxiv -tbo $THUMBNAILS || notify-send -i 'none' -t 3000 "SubTube" "No videos to play")
@@ -108,7 +108,7 @@ pick_thumbnails(){
                 fi
                 url="https://www.youtube.com/watch?v=$id"
                 TITLE=$(wget --quiet -O - $url | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
-                echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
+                [[ -f /home/infiniter/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
                 youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
             fi
         done <<< "$chosen"
@@ -137,7 +137,7 @@ pick_rofi(){
                 notify_name "Playing" $id
                 url="https://www.youtube.com/watch?v=$id"
                 TITLE=$(cat $SUBTUBE_TITLE | grep $id | awk '{print $2}')
-                echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
+                [[ -f /home/infiniter/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
                 youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
             fi
         done <<< "$chosen"
@@ -173,7 +173,7 @@ play_queue(){
             | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
         sed -i '1d' $SUBTUBE_QUEUE
         lego_refresh "subtube"
-        echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
+        [[ -f /home/infiniter/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
         notify-send -i 'none' "Queue playing" "$TITLE"
         youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
     done
