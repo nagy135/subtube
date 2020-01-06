@@ -85,7 +85,7 @@ update(){
 }
 
 pick_thumbnails(){
-    [[ $XDG_SESSION_DESKTOP == 'bspwm' ]] && bspc rule -a Sxiv --one-shot sticky=on state=floating rectangle=800x500+560+250
+    [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot sticky=on state=floating rectangle=800x500+560+250
     if [[ $(ls $THUMBNAILS | wc -l) -gt 16 ]] && [[ $XDG_SESSION_DESKTOP == 'bspwm' ]]; then
         notify-send -t 4000 -i 'none' -u low "Warning" "Thumbnails do not fit in sxiv"
     fi
