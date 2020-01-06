@@ -49,6 +49,7 @@ cd subtube
 sudo make install
 ```
 These commands will clone repository and install all the files to **/usr/bin**, **/usr/share/subtube**
+If you want to change the code and rebuild it without loosing watched history, use `sudo make reinstall`
 
 ## UNINSTALL
 removes all files created
@@ -65,8 +66,8 @@ subtube command
 if ran without command, help is shown.
 The optimal workflow you should try is to bind commands to key presses in key handler of your choice. I prefer this comfiguration:
 
-Key press | command 
---- | --- 
+Key press | command
+--- | ---
 super+y | `subtube play`
 super+shift+y | `subtube update`
 super+ctrl+y | `subtube play_queue`
