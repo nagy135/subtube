@@ -94,7 +94,7 @@ pick_thumbnails(){
         num=$(echo "$chosen" | wc -l)
         i=1
         while read choice; do
-            id=$(echo "$choice" | sed "s/\/usr\/share\/subtube\/resources\/thumbnails\/\([^.]\+\)\.jpg/\1/" | sed "s/.*-//")
+            id=$(echo "$choice" | sed "s/\/usr\/share\/subtube\/resources\/thumbnails\/\([^.]\+\)\.jpg/\1/" | sed "s/[^-]*-//")
             rm $choice
             sed -i "/$id/d" $SUBTUBE_TITLE
             if [[ $1 == "remove" ]]; then
