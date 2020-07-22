@@ -21,4 +21,10 @@ uninstall:
 	rm $(PREFIX)/bin/subtube
 	rm -rf $(PREFIX)/share/subtube
 
+sync:
+	cp -R $(PREFIX)/share/subtube/resources/* resources
+	git add resources
+	git commit -m 'resources update'
+	git push
+
 .PHONY: install uninstall reinstall
