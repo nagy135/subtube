@@ -10,6 +10,8 @@ PLAYING_ICON=$PREFIX/subtube-playing.png
 YOUTUBE_ICON=$PREFIX/subtube_youtube.png
 THUMBNAILS=$PREFIX/thumbnails
 NAMES=$PREFIX/subscribes_names
+fifo=/tmp/subtube.fifo
+progressbar_pid=-1
 
 thumbnail(){
     order=$(ls -l $THUMBNAILS | wc -l)
@@ -22,22 +24,20 @@ viewer(){
 }
 
 progress_bar(){
-    done=$1
-    total=$2
-    percentage=$(($done*100/$total))
-
-    bar_width=$3
-    bar_tiles=$((bar_width*percentage/100))
-    sep=$(echo -en "\u2014")
-    bar=$(seq -s "$sep" $(($bar_tiles+1)) | sed 's/[0-9]//g')
-
-    space_tiles=$(($bar_width-$bar_tiles))
-    spaces=""
-    for ((i=0; i<$space_tiles; i++)); do spaces=" $spaces"; done
-
-    res="$bar$spaces"
-
-    notify-send -t 4000 -i 'none' -u normal "SUBTUBE - Update" "<span>$res</span>"
+    if [[ $1 == '-d' ]]; then
+        mkfifo $fifo
+        chmod 766 $fifo
+        subcount=$(cat $SUBSCRIBES | wc -l)
+        tail -f $fifo | xob -t 5000 -s subtube -m $subcount &
+        progressbar_pid=$!
+        echo "progressbar_pid" $progressbar_pid
+    elif [[ $1 == '-k' ]]; then
+        rm $fifo
+        kill $progressbar_pid
+        pkill -f "tail -f $fifo"
+    else
+        echo $1 > $fifo
+    fi
 }
 
 update(){
@@ -52,6 +52,9 @@ update(){
         exit 0
     else
         touch /tmp/subtube_update.pid
+    fi
+    if [[ $1 != "secret" ]]; then
+        progress_bar -d
     fi
     i=0
     sub_i=0
@@ -70,20 +73,25 @@ update(){
                 continue
             else
                 [[ -z "$vid_id" ]] && continue
+                clean_vid_id=$vid_id
                 if [[ $1 != "init" ]]; then
                     thumbnail $vid_id
                 fi
-                # title=$(wget --quiet -O - "https://www.youtube.com/watch?v=$vid_id" | paste -s -d " " | sed -e 's!.*<head>\(.*\)</head>.*!\1!' | sed -e 's!.*<title>\(.*\)</title>.*!\1!' | sed 's/\s*-\s*YouTube//' | perl -MHTML::Entities -pe 'decode_entities($_);')
-                title=$(ytb-title "$video_id")
                 echo $vid_id >> $SEEN
                 vid_id=$(ls $THUMBNAILS | grep $vid_id | sed "s/\..*//")
-                notify-send -i 'none' -t 3000 "NEW VIDEO" "$title" -u critical -i $THUMBNAILS/$vid_id.jpg
+                url="https://www.youtube.com/watch?v=$clean_vid_id"
+                title=$(youtube-dl -e $url)
+                echo "title" $title
+                duration=$(youtube-dl --get-duration $url)
+                echo "duration" $duration
+                notify-send -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
             fi
         done <<< "$vid_ids"
     done < $SUBSCRIBES
     sleep 2
     if [[ $1 != "secret" ]]; then
         notify-send -i 'none' -t 3000 "SUBTUBE" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
+        progress_bar -k
     fi
     rm /tmp/subtube_update.pid
 }
