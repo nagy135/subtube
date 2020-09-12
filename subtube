@@ -2,25 +2,134 @@
 
 PREFIX=/usr/share/subtube/resources
 
+# list of seen video hashes
 SEEN=$PREFIX/seen.lst
+
+# storage of data regarding subscribed channels
 SUBSCRIBES=$PREFIX/subscribes
-SUBTUBE_QUEUE=$PREFIX/subtube_queue
-SUBTUBE_TITLE=$PREFIX/subtube_title.db
+
+# icons
 PLAYING_ICON=$PREFIX/subtube-playing.png
 YOUTUBE_ICON=$PREFIX/subtube_youtube.png
+
+# location of thumbnails
 THUMBNAILS=$PREFIX/thumbnails
-NAMES=$PREFIX/subscribes_names
+
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
-thumbnail(){
-    order=$(ls -l $THUMBNAILS | wc -l)
-    order=$(($order-1))
-    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$order-$1.jpg
+
+add_subscriber(){
+    echo $2 >> $SUBSCRIBES
 }
 
-viewer(){
-    alacritty --class subtube_viewer -e youtube-viewer &> /dev/null &
+update(){
+    # internet verification
+    wget -q --spider http://google.com
+    if [[ $? -gt 0 ]]; then
+        notify-send -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
+        exit 1
+    fi
+    # avoid running twice at the same time
+    if [[ -f /tmp/subtube_update.pid ]]; then
+        notify-send -i 'none' -u critical "Subtube" "Update already in progress, wait..."
+        exit 0
+    else
+        touch /tmp/subtube_update.pid
+    fi
+
+    # initialize progress bar (xob)
+    [[ $1 != "secret" ]] && progress_bar -d
+
+    # init loop variables
+    sub_i=0
+    subcount=$(cat $SUBSCRIBES | wc -l)
+
+    # loop over subscribed urls
+    while read line; do
+        sub_i=$((sub_i+1))
+
+        # notify progress
+        [[ $1 != "secret" ]] && progress_bar $sub_i $subcount 30
+
+        # get first 10 video hashes parsed from youtube video page
+        vid_ids=$(curl -s $line | grep ytInitialData | head -n 1 | sed 's/;$// ; s/window\["ytInitialData"\]\s*=\s*//' | jq -r '.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].gridRenderer.items | .[].gridVideoRenderer.videoId' | head)
+
+        # loop over hashes
+        while read vid_id; do
+
+            # filter out already seen ones
+            [[ ! -z $(grep -e "^$vid_id$" $SEEN) ]] && continue
+
+            # if problem occured during parsing 
+            [[ -z "$vid_id" ]] && notify-send -u critical "Subtube" "parsed empty video hash" && continue
+
+            [[ $1 != "init" ]] && get_thumbnail $vid_id
+            echo $vid_id >> $SEEN
+
+            # get video metadata
+            url="https://www.youtube.com/watch?v=$vid_id"
+            title=$(youtube-dl -e $url)
+            duration=$(youtube-dl --get-duration $url)
+
+            notify-send -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
+        done <<< "$vid_ids"
+
+
+    done < $SUBSCRIBES
+
+    # kill progress bar
+    if [[ $1 != "secret" ]]; then
+        notify-send -i 'none' -t 3000 "Subtube" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
+        progress_bar -k
+    fi
+
+    # update finished, remove update flag
+    rm /tmp/subtube_update.pid
+}
+
+play(){
+    # bspwm users get floating sxiv centered in middle of the screen
+    [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot sticky=on state=floating rectangle=800x500+560+250
+
+    chosen=$(sxiv -tbo $THUMBNAILS || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
+    [[ -z $chosen ]] && exit
+    count=$(echo "$chosen" | wc -l)
+    i=1
+    while read choice; do
+        # get video hash
+        id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
+        rm $choice
+                if [[ $count -eq 1 ]]; then
+                    notify_name "Playing" $id
+                else
+                    notify_name "Playing $i/$count" $id
+                    i=$((i+1))
+                fi
+
+                url="https://www.youtube.com/watch?v=$id"
+                TITLE=$(youtube-dl -e "$url")
+
+                # integration with mpv_history, script of mine storing every seen video
+                [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
+
+                mpv "$url" &> /dev/null
+    done <<< "$chosen"
+}
+
+notify_name(){
+    title=$(youtube-dl -e "https://www.youtube.com/watch?v=$2")
+    echo "playing: $title"
+    if [[ $1 == "Playing" ]]; then
+        notify-send -i $PLAYING_ICON -t 4000 "$1" "$title"
+    else
+        notify-send -i 'none' -t 4000 "$1" "$title"
+    fi
+
+}
+
+get_thumbnail(){
+    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
 }
 
 progress_bar(){
@@ -28,9 +137,8 @@ progress_bar(){
         mkfifo $fifo
         chmod 766 $fifo
         subcount=$(cat $SUBSCRIBES | wc -l)
-        tail -f $fifo | xob -t 5000 -s subtube -m $subcount &
+        tail -f $fifo | xob -t 5000 -s subtube -m $subcount &> /dev/null &
         progressbar_pid=$!
-        echo "progressbar_pid" $progressbar_pid
     elif [[ $1 == '-k' ]]; then
         rm $fifo
         kill $progressbar_pid
@@ -40,214 +148,16 @@ progress_bar(){
     fi
 }
 
-update(){
-    wget -q --spider http://google.com
-
-    if [[ $? -gt 0 ]]; then
-        notify-send -t 4000 -i 'none' -u critical "SUBTUBE" "No internet connection"
-        exit 1
-    fi
-    if [[ -f /tmp/subtube_update.pid ]]; then
-        notify-send -i 'none' -u critical "Subtube" "Update already in progress, wait..."
-        exit 0
-    else
-        touch /tmp/subtube_update.pid
-    fi
-    if [[ $1 != "secret" ]]; then
-        progress_bar -d
-    fi
-    i=0
-    sub_i=0
-    subcount=$(cat $SUBSCRIBES | wc -l)
-    while read line; do
-        sub_i=$((sub_i+1))
-        if [[ $1 != "secret" ]]; then
-            progress_bar $sub_i $subcount 30
-        fi
-        echo $line
-        # vid_ids=$(wget -qO- $line | grep "ux-thumb-wrap"| head -n 5 | cut -d\" -f4 | cut -d\= -f2)
-        vid_ids=$(curl -s $line | grep ytInitialData | head -n 1 | sed 's/;$// ; s/window\["ytInitialData"\]\s*=\s*//' | jq -r '.contents.twoColumnBrowseResultsRenderer.tabs[1].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].gridRenderer.items | .[].gridVideoRenderer.videoId' | head)
-        echo "$vid_ids"
-        while read vid_id; do
-            if [[ ! -z $(grep -e "^$vid_id$" $SEEN) ]]; then
-                continue
-            else
-                [[ -z "$vid_id" ]] && continue
-                clean_vid_id=$vid_id
-                if [[ $1 != "init" ]]; then
-                    thumbnail $vid_id
-                fi
-                echo $vid_id >> $SEEN
-                vid_id=$(ls $THUMBNAILS | grep $vid_id | sed "s/\..*//")
-                url="https://www.youtube.com/watch?v=$clean_vid_id"
-                title=$(youtube-dl -e $url)
-                echo "title" $title
-                duration=$(youtube-dl --get-duration $url)
-                echo "duration" $duration
-                notify-send -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
-            fi
-        done <<< "$vid_ids"
-    done < $SUBSCRIBES
-    sleep 2
-    if [[ $1 != "secret" ]]; then
-        notify-send -i 'none' -t 3000 "SUBTUBE" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
-        progress_bar -k
-    fi
-    rm /tmp/subtube_update.pid
-}
-
-pick_thumbnails(){
-    [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot sticky=on state=floating rectangle=800x500+560+250
-    if [[ $(ls $THUMBNAILS | wc -l) -gt 16 ]] && [[ $XDG_SESSION_DESKTOP == 'bspwm' ]]; then
-        notify-send -t 4000 -i 'none' -u low "Warning" "Thumbnails do not fit in sxiv"
-    fi
-    chosen=$(sxiv -tbo $THUMBNAILS || notify-send -i 'none' -t 3000 "SubTube" "No videos to play")
-    if [[ ! -z $chosen ]]; then
-        num=$(echo "$chosen" | wc -l)
-        i=1
-        while read choice; do
-            id=$(echo "$choice" | sed "s/\/usr\/share\/subtube\/resources\/thumbnails\/\([^.]\+\)\.jpg/\1/" | sed "s/[^-]*-//")
-            rm $choice
-            sed -i "/$id/d" $SUBTUBE_TITLE
-            if [[ $1 == "remove" ]]; then
-                notify_name "Removing" $id
-            else
-                if [[ $num -eq 1 ]]; then
-                    notify_name "Playing" $id
-                else
-                    notify_name "Playing $i/$num" $id
-                    i=$((i+1))
-                fi
-                url="https://www.youtube.com/watch?v=$id"
-                # TITLE=$(wget --quiet -O - $url | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
-                
-                TITLE=$(ytb-title "$id")
-                [[ -f /home/infiniter/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
-                mpv --pause "$url"
-            fi
-        done <<< "$chosen"
-    fi
-}
-
-pick_rofi(){
-    echo "NotImplementedError"
-    exit 1
-    if [[ $(cat $SUBTUBE_TITLE | wc -l) -eq 0 ]]; then
-        notify-send -i 'none' -t 3000 "SubTube" "Nothing to watch"
-    fi
-    chosen=$(cat $SUBTUBE_TITLE | sed 's/^[^\ ]*\ *//'| rofi -dmenu -p "Subtube videos" || notify-send -i 'none' -t 3000 "SubTube" "No videos chosen")
-    if [[ ! -z $chosen ]]; then
-        while read choice; do
-            id=$(cat $SUBTUBE_TITLE | sed -n "/$chosen/p" | awk '{print $1}')
-            if [[ ! -z $id ]]; then
-                sed -i "/$id/d" $SUBTUBE_TITLE
-                rm $THUMBNAILS/$id.jpg
-            else
-                exit 1
-            fi
-            if [[ $1 == "remove" ]]; then
-                notify_name "Removing" $id
-            else
-                notify_name "Playing" $id
-                url="https://www.youtube.com/watch?v=$id"
-                TITLE=$(cat $SUBTUBE_TITLE | grep $id | awk '{print $2}')
-                [[ -f /home/infiniter/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
-                youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
-            fi
-        done <<< "$chosen"
-    fi
-}
-
-clean(){
-    rm ~/.scripts/resources/thumbnails/*
-}
-
-name(){
-    url=$1	
-    url=$(echo ${url##*/} | sed 's/[0-9]*\-//;s/\.jpg$//')
-    url="https://www.youtube.com/watch?v=$url"
-    title=$(youtube-dl -e $url)
-    duration=$(youtube-dl --get-duration $url)
-    notify-send -i 'none' -t 4000 "$title" "$duration"
-}
-
-add_queue(){
-    id=$(echo "$1" | sed "s/\/usr\/share\/subtube\/resources\/thumbnails\/\([^.]\+\)\.jpg/\1/" | sed "s/[^-]*-//")
-    echo "$id" >> $SUBTUBE_QUEUE
-}
-
-play_queue(){
-    len=$(cat $SUBTUBE_QUEUE | wc -l)
-    if [[ $len -eq 0 ]]; then
-        notify-send -i 'none' "Queue" "nothing to play"
-        exit 0
-    fi
-    for i in $(seq 1 $len); do
-        id=$(sed -n "1p" $SUBTUBE_QUEUE)
-        url="https://www.youtube.com/watch?v=$id"
-        # TITLE=$(wget --quiet -O - $url | sed -n -e 's!.*<title>\(.*\)</title>.*!\1!p')
-        TITLE=$(ytb-title "$id")
-        sed -i '1d' $SUBTUBE_QUEUE
-        [[ -f /home/infiniter/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> /home/infiniter/.local/share/qutebrowser/mpv_history
-        notify-send -i 'none' "Queue playing" "$TITLE"
-        youtube-viewer --no-interactive --resolution=720p --player=mpv "$url"
-    done
-}
-
-notify_name(){
-    # title=$(wget --quiet -O - "https://www.youtube.com/watch?v=$2" | paste -s -d " " | sed -e 's!.*<head>\(.*\)</head>.*!\1!' | sed -e 's!.*<title>\(.*\)</title>.*!\1!' | sed 's/\s*-\s*YouTube//')
-    title=$(ytb-title "$2")
-    if [[ $1 == "Playing" ]]; then
-        notify-send -i $PLAYING_ICON -t 4000 "$1" "$title"
-    else
-        notify-send -i 'none' -t 4000 "$1" "$title"
-    fi
-
-}
-
-list(){
-    subs=$(cat $SUBSCRIBES | wc -l)
-    subs_names=$(cat $NAMES | wc -l)
-    i=0
-    if [[ ! $subs -eq $subs_names ]]; then
-        while read sub; do
-            i=$(($i+1))
-            if [[ $i -le $subs_names ]]; then
-                continue
-            fi
-            name=$(wget --quiet -O - "$sub" | sed -n '/og\:title/p' | sed 's/.*content="\([^"]\+\).*/\1/')
-            echo $name >> $NAMES
-        done < $SUBSCRIBES
-    fi
-    cat $NAMES
-}
-
 if [[ $1 == 'update' ]]; then
     update
 elif [[ $1 == 'secret_update' ]]; then
     update secret
 elif [[ $1 == 'init' ]]; then
     update init
-elif [[ $1 == 'viewer' ]]; then
-    viewer
 elif [[ $1 == 'play' ]]; then
-    pick_thumbnails
-elif [[ $1 == 'add_queue' ]]; then
-    add_queue $2
-elif [[ $1 == 'play_queue' ]]; then
-    play_queue
-elif [[ $1 == 'rofi_play' ]]; then
-    pick_rofi
-elif [[ $1 == 'remove' ]]; then
-    pick_thumbnails remove
-elif [[ $1 == 'clean' ]]; then
-    clean
-elif [[ $1 == 'name' ]]; then
-    name $2
+    play
 elif [[ $1 == 'add' ]]; then
-    echo $2 >> $SUBSCRIBES
-elif [[ $1 == 'list' ]]; then
-    list
+    add_subscriber $2
 else
     echo "Usage: subtube [OPTION]"
     echo "Youtube interface without browser"
@@ -255,15 +165,9 @@ else
     echo "Options:"
     echo "  -h, --help                 show this message and quit"
     echo "  update                     update database"
-    echo "  secret_update              update database without notification"
-    echo "  init                       initial start, just fill db with old videos"
-    echo "  play                       sxiv -t selection"
-    echo "  add_queue                  add item to queue (sxiv keyhandler)"
-    echo "  play_queue                 play videos in queue"
-    echo "  rofi_play                  rofi selection"
-    echo "  remove                     remove selected options"
-    echo "  clean                      cleans downloaded thumbnails"
-    echo "  name                       notify-send name of video"
+    echo "    --secret                 update database without notifications (for crontab)"
+    echo "    -s                       alias --secret"
+    echo "  play                       sxiv picking dialog for playing all marked videos"
+    echo "  init                       dont download thumbnails - for first time"
     echo "  add                        add subscriber"
-    echo "  list                       list all subscriber names"
 fi
