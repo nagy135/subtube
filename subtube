@@ -15,6 +15,7 @@ YOUTUBE_ICON=$PREFIX/subtube_youtube.png
 # location of thumbnails
 THUMBNAILS=$PREFIX/thumbnails
 
+# variables for XOB (progress bar)
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
@@ -131,6 +132,10 @@ play(){
         # integration with mpv_history, script of mine storing every seen video
         [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
 
+        # try to play it until it works (maximum 3 times)
+        # mpv has youtube-dl hook and sometimes it work on second try
+        # if 3 times is not enough, you probably just need to update your 
+        # local youtube-dl (python -m pip install --upgrade youtube-dl)
         n=0
         until [ "$n" -ge 3 ]
         do
