@@ -10,17 +10,24 @@ This project has couple of dependecies you have to have. If you use arch or almo
 * [sxiv](https://github.com/muennich/sxiv)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 * [mpv](https://github.com/mpv-player/mpv)
-* [youtube-viewer](https://github.com/trizen/youtube-viewer)
 * [dunst](https://github.com/dunst-project/dunst)
+* [xob](https://github.com/florentc/xob)
 
-First 3 are core, while latter 2 will be optional in future. As of now, you need all of them.
-**Youtube-viewer** provides (in my opinion) faster video loading and seeking and **dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking (usefull to show update progress bar).
+First 3 are core, while latter 2 will be optional in future. As of now, I recommend having all of those.
+**Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
+**XOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube secret_update` that doesnt spawn any progress bar anyway.
 
 ## ARCH
 on arch based distro, get dependencies like this
 ```
 pip install --user youtube-dl
-sudo pacman -S sxiv, mpv, youtube-viewer, dunst
+sudo pacman -S sxiv, mpv, dunst
+yay -S xob
+```
+
+if script stops working one day for you, you need to update your youtube-dl
+```
+pip install --user --update youtube-dl
 ```
 
 ## DEBIAN/UBUNTU
@@ -33,12 +40,10 @@ youtube-viewer is not present on debian repo, install from source via link in *d
 
 ```
 cd /tmp # or anywhere else if you wish to preserve repository
-git clone https://github.com/trizen/youtube-viewer
-cd youtube-viewer
-sudo cpan install CPAN ExtUtils::PkgConfig Module::Build inc::latest PAR::Dist Term::ReadLine::Gnu::XS Unicode::GCString LWP::Protocol::https Data::Dump JSON Gtk2 File::ShareDir
-perl Build.PL
-sudo ./Build installdeps
-sudo ./Build install
+git clone https://github.com/florentc/xob
+cd xob
+make
+sudo make install
 ```
 
 # INSTALL
@@ -59,7 +64,7 @@ sudo make uninstall
 
 # USAGE
 
-provides CLI interface via subtube
+provides CLI interface via subtube (you might wanna check `subtube --help`)
 ```
 subtube command
 ```
@@ -70,7 +75,6 @@ Key press | command
 --- | ---
 super+y | `subtube play`
 super+shift+y | `subtube update`
-super+ctrl+y | `subtube play_queue`
 
 ## COMMANDS
 
@@ -107,20 +111,6 @@ subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
-### queue
-this feature is simply to allow you to specify custom order of videos. If you mark videos with **m** they will be played in order they show inside sxiv. Look at **SXIV integration** for more information. Command bellow plays queued videos in your order. You simply run `subtube play`, use sxiv binds (defined bellow, `ctrl+x q`) to "remove" thumbnails from list and close sxiv with `q`. After that just run `subtube play_queue` to play videos in order you specified.
-```
-subtube play_queue
-```
-
-
-### clean
-cleans thumbnails folder
-
-```
-subtube clean
-```
-
 # SXIV integration
 if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use queue feature, you will be able to show video title as notification or remove thumbnails.
 
@@ -149,18 +139,10 @@ chmod +x ~/.config/sxiv/exec/key-handler
 
 this allows you to use sxiv prefix (ctrl+x) in combination with key inside quotes to perform additional actions
 
-# DUNST
-
-Put this block to your dunst config to avoid notification spam of update progress. If you dont want this notification at all, try "secret_update" command.
-
-```
-[subtube]
-    summary = *SUBTUBE - Update*
-    set_stack_tag = 55
-```
-
 # CRONTAB
 put these lines to you crontab file to download new thumbnails every 10 minutes.
+There is little issue with this showing notification on some systems. You might have to google a little to make it work.
+But once your crontab can regularly spawn `notify send 'title' 'body'`, it will work and refresh new videos regularly.
 ```
 */10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube secret_update
 ```
@@ -169,6 +151,4 @@ put these lines to you crontab file to download new thumbnails every 10 minutes.
 i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
 
 # FUTURE WORK
-* make youtube-viewer optional dependency (run pure youtube-dl if needed)
-* fix rofi_play, to allow to play video via it's title, not just thumbnail
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
