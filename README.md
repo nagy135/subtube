@@ -151,4 +151,5 @@ But once your crontab can regularly spawn `notify send 'title' 'body'`, it will 
 i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
 
 # FUTURE WORK
+* TOP PRIORITY: AUR
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
