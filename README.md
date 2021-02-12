@@ -72,7 +72,7 @@ provides CLI interface via subtube (you might wanna check `subtube --help`)
 subtube command
 ```
 if ran without command, help is shown.
-The optimal workflow you should try is to bind commands to key presses in key handler of your choice. I prefer this comfiguration:
+The optimal workflow you should try is to bind commands to key presses in key handler of your choice. I prefer this configuration:
 
 Key press | command
 --- | ---
