@@ -4,7 +4,7 @@
 
 ![sxiv picker](screen.png)
 
-Easy to use script that lets you watch your subscribed youtube channels with no distraction that youtube page has. Script has couple of dependecies, and my personal version has modified sxiv, therefore screenshot is not accurate to most of you (just showing off possibilities).
+Easy to use script that lets you watch your subscribed youtube channels with no distraction that youtube page has. Script has couple of dependecies, and my personal version has modified sxiv, therefore screenshot is not accurate to most of you (just showing off possibilities). Script downloads only video thumbnail and actual video download happens after you pick video in sxiv (image viewer).
 
 # DEPENDECIES
 
