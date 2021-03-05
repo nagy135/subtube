@@ -24,6 +24,14 @@ add_subscriber(){
     echo $1 >> $SUBSCRIBES
 }
 
+metadata(){
+    id=$(echo "$1" | sed "s/.*\/// ; s/\.jpg//")
+    url="https://www.youtube.com/watch?v=$id"
+    TITLE=$(youtube-dl -e "$url")
+    duration=$(youtube-dl --get-duration $url)
+    notify-send -i $1 "$TITLE" "$duration"
+}
+
 update(){
     # internet verification
     wget -q --spider http://google.com
@@ -190,6 +198,8 @@ elif [[ $1 == 'play' ]]; then
     play
 elif [[ $1 == 'add' ]]; then
     add_subscriber $2
+elif [[ $1 == 'metadata' ]]; then
+    metadata $2
 else
     echo "Usage: subtube [OPTION]"
     echo "Youtube interface without browser"
@@ -201,5 +211,6 @@ else
     echo "    -s                       alias --secret"
     echo "  play                       sxiv picking dialog for playing all marked videos"
     echo "  init                       dont download thumbnails - for first time"
+    echo "  metadata                   notify-send video title (with length)"
     echo "  add \$url                  add subscriber (video page url of youtube channel)"
 fi
