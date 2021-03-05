@@ -115,7 +115,7 @@ subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
 # SXIV integration
-if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to use queue feature, you will be able to show video title as notification or remove thumbnails.
+if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to show video title as notification or remove thumbnails.
 
 After install of sxiv, create config folder and key handler script like this
 ```
@@ -131,7 +131,6 @@ then add this content to a file  (If this case statement already exists, so just
 case "$1" in
     "n")      while read file; do subtube name $file; done ;; # notify video title
     "t")      while read file; do subtube name $file; done ;; # notify video title (alias)
-    "q")      while read file; do subtube add_queue $file; rm $file; done ;; # adds video to queue
     "r")      while read file; do rm $file; done ;; # remove thumbnail
 esac
 ```
