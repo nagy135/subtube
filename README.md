@@ -129,7 +129,8 @@ then add this content to a file  (If this case statement already exists, so just
 #!/bin/bash
 
 case "$1" in
-    "m")      while read file; do subtube metadata $file; done ;; # notify video title (alias)
+    "n")      while read file; do subtube name $file; done ;;
+    "l")      while read file; do subtube name_length $file; rm $file; done ;;
     "r")      while read file; do rm $file; done ;; # remove thumbnail
 esac
 ```
