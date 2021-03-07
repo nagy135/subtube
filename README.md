@@ -130,7 +130,7 @@ then add this content to a file  (If this case statement already exists, so just
 
 case "$1" in
     "n")      while read file; do subtube name $file; done ;;
-    "l")      while read file; do subtube name_length $file; rm $file; done ;;
+    "l")      while read file; do subtube name_length $file; done ;;
     "r")      while read file; do rm $file; done ;; # remove thumbnail
 esac
 ```
