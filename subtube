@@ -43,7 +43,7 @@ update(){
     fi
     # avoid running twice at the same time
     if [[ -f /tmp/subtube_update.pid ]]; then
-        notify-send -i 'none' -u critical "Subtube" "Update already in progress, wait..."
+        notify-send -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
         exit 0
     else
         touch /tmp/subtube_update.pid
