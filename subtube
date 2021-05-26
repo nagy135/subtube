@@ -128,13 +128,13 @@ play(){
     while read choice; do
         # get video hash
         id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
-        rm $choice
         if [[ $count -eq 1 ]]; then
-            notify_name "Playing" $id
+            notify_name "Playing" $id $choice
         else
-            notify_name "Playing $i/$count" $id
+            notify_name "Playing $i/$count" $id $choice
             i=$((i+1))
         fi
+        rm $choice
 
         url="https://www.youtube.com/watch?v=$id"
         TITLE=$(youtube-dl -e "$url")
@@ -161,7 +161,7 @@ notify_name(){
     title=$(youtube-dl -e "https://www.youtube.com/watch?v=$2")
     echo "playing: $title"
     if [[ $1 == "Playing" ]]; then
-        notify-send -i $PLAYING_ICON -t 4000 "$1" "$title"
+        notify-send -i "$3" -t 4000 "$1" "$title"
     else
         notify-send -i 'none' -t 4000 "$1" "$title"
     fi
