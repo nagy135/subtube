@@ -159,12 +159,7 @@ play(){
 
 notify_name(){
     title=$(youtube-dl -e "https://www.youtube.com/watch?v=$2")
-    echo "playing: $title"
-    if [[ $1 == "Playing" ]]; then
-        notify-send -i "$3" -t 4000 "$1" "$title"
-    else
-        notify-send -i 'none' -t 4000 "$1" "$title"
-    fi
+    notify-send -i "$3" -t 4000 "$1" "$title"
 
 }
 
