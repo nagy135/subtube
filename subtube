@@ -126,6 +126,10 @@ play(){
     count=$(echo "$chosen" | wc -l)
     i=1
     while read choice; do
+        # first move it so that its 'removed' instantly
+        file_name=$(basename $choice)
+        mv $choice "/tmp/$file_name"
+        choice="/tmp/$file_name"
         # get video hash
         id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
         if [[ $count -eq 1 ]]; then
