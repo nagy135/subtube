@@ -4,7 +4,17 @@
 
 ![sxiv picker](screen.png)
 
-Easy to use script that lets you watch your subscribed youtube channels with no distraction that youtube page has. Script has couple of dependecies, and my personal version has modified sxiv, therefore screenshot is not accurate to most of you (just showing off possibilities). Script downloads only video thumbnail and actual video download happens after you pick video in sxiv (image viewer).
+Simple script that lets you watch videos from your subscribed channels without distraction of youtube page.
+
+# Explanation
+Whole idea came from realizing that [sxiv](https://github.com/muennich/sxiv) in it's thumbnail mode allows
+you to select images the same way programs like rofi, dmenu, fzf, etc.
+This makes it usefull as some sort of dialog.
+Images contain *video id* in it's name so all you need is to play it via [mpv](https://github.com/mpv-player/mpv)
+through [youtube-dl](https://github.com/ytdl-org/youtube-dl).
+Screenshot above has my modified fork of [sxiv](https://github.com/muennich/sxiv) so it looks little different.
+
+I rewrote this script with a lot of comments so feel free to fork and modify it to your liking
 
 # DEPENDECIES
 
