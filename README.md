@@ -26,9 +26,10 @@ This project has couple of dependecies you have to have. If you use arch or almo
 * [dunst](https://github.com/dunst-project/dunst)
 * [xob](https://github.com/florentc/xob)
 
-First 3 are core, while latter 2 will be optional in future. As of now, I recommend having all of those.
+First 3 are core, last 2 are optional.
 **Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
-**XOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube secret_update` that doesnt spawn any progress bar anyway.
+Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
+**XOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube secret_update` that doesnt spawn any progress bar anyway. Using `subtube play` would result in some error messages.
 
 ## ARCH
 on arch based distro, get dependencies like this
