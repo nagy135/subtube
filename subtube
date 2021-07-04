@@ -198,17 +198,17 @@ elif [[ $1 == 'init' ]]; then
 elif [[ $1 == 'play' ]]; then
     play
 elif [[ $1 == 'add' ]]; then
-    [[ $@ -lt 2 ]] \
+    [ $# -lt 2 ] \
         && echo "Pass url to videos page!" \
         && exit 1
     add_subscriber $2
 elif [[ $1 == 'name' ]]; then
-    [[ $@ -lt 2 ]] \
+    [ $# -lt 2 ] \
         && echo "Pass path to file with video id!" \
         && exit 1
     metadata name $2
 elif [[ $1 == 'name_length' ]]; then
-    [[ $@ -lt 2 ]] \
+    [ $# -lt 2 ] \
         && echo "Pass path to file with video id!" \
         && exit 1
     metadata name_length $2
