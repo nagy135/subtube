@@ -127,7 +127,13 @@ play(){
     [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
     chosen=$(sxiv -tbo $thumbnails || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
-    [[ -z $chosen ]] && exit
+
+    if [[ -z $chosen ]]; then
+        [[ -z $1 ]] \
+            && exit \
+            || return
+    fi
+
     count=$(echo "$chosen" | wc -l)
     i=1
     while read choice; do
