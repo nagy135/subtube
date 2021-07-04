@@ -182,25 +182,27 @@ time_selection(){
     tmp_thumbnails="/tmp/tmp_thumbnails_$sel_type"
     mkdir -p $tmp_thumbnails
 
+    # set find flags
     flag="-mtime"
     argument=+$1
     [[ $sel_type == "newest" ]] \
         && flag="-mmin" \
         && argument="-$1"
+
     # move all older than N days into the directory
     find $THUMBNAILS \
         $flag $argument \
         -type f \
         -exec mv -t $tmp_thumbnails {} +
 
-    # delete marked
-    chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
-
-    if [[ ! -z $chosen ]]; then
-        [[ $sel_type == "newest" ]] \
-            && play $tmp_thumbnails \
-            || rm $chosen
+    # perform sxiv selection
+    if [[ $sel_type == "newest" ]]; then
+        play $tmp_thumbnails
+    else
+        chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
+        [[ ! -z $chosen ]] && rm $chosen
     fi
+
     # move rest back
     mv $tmp_thumbnails/* $THUMBNAILS 2> /dev/null
 
