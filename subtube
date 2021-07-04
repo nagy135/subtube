@@ -248,5 +248,6 @@ else
     echo "  init                       dont download thumbnails - for first time"
     echo "  name                       notify-send video title"
     echo "  name_length                notify-send video title (with length)"
+    echo "  clean                      select videos older than N days to delete"
     echo "  add \$url                  add subscriber (video page url of youtube channel)"
 fi
