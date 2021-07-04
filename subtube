@@ -167,6 +167,23 @@ notify_name(){
 
 }
 
+clean(){
+    # make sure folder exists
+    tmp_thumbnails=/tmp/tmp_thumbnails
+    mkdir -p $tmp_thumbnails
+
+    # move all older than N days into the directory
+    find $THUMBNAILS -mtime +$1 -type f -exec mv -t $tmp_thumbnails {} +
+
+    # delete marked
+    chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
+    [[ ! -z $chosen ]] \
+        && rm $chosen
+
+    # move rest back
+    mv $tmp_thumbnails/* $THUMBNAILS
+}
+
 get_thumbnail(){
     wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
 }
@@ -197,6 +214,12 @@ elif [[ $1 == 'init' ]]; then
     update init
 elif [[ $1 == 'play' ]]; then
     play
+elif [[ $1 == 'clean' ]]; then
+    [ $# -lt 2 ] \
+        && echo "Pass number that specifies how many days" \
+        "old videos to keep (delete older)" \
+        && exit 1
+    clean $2
 elif [[ $1 == 'add' ]]; then
     [ $# -lt 2 ] \
         && echo "Pass url to videos page!" \
