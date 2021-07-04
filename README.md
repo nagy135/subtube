@@ -39,11 +39,6 @@ sudo pacman -S sxiv, mpv, dunst
 yay -S xob
 ```
 
-if script stops working one day for you, you need to update your youtube-dl
-```
-pip install --user --update youtube-dl
-```
-
 ## DEBIAN/UBUNTU
 
 ```
@@ -59,6 +54,13 @@ cd xob
 make
 sudo make install
 ```
+
+# UPDATE
+if script stops working one day for you, you need to update your youtube-dl
+```
+pip install --user --update youtube-dl
+```
+
 
 # INSTALL
 
@@ -88,12 +90,13 @@ The optimal workflow you should try is to bind commands to key presses in key ha
 Key press | command
 --- | ---
 super+y | `subtube play`
-super+shift+y | `subtube update`
+super+F5 | `subtube update`
 
 ## COMMANDS
 
 ### init
-starts initial update, fills seen database without actually downloading thumbnails (update would download 5 latest videos from channels you probably saw)
+performs update but doesnt actually download any image. This is to fill your *seen database*.
+You can skip this and run *update* instead.
 
 ```
 subtube init
@@ -117,14 +120,15 @@ subtube play
 ```
 
 ### add
-adds new subscribed channel
+adds new subscribed channel.
+This is link of channel's videos page (we parse that page so it needs to be videos tab)
 
 ```
 subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 ```
 
 ### clean
-gives you option to find and select to remove old videos, where N means **at least N days old videos**. This brings sxiv selection to mark videos for deletion
+gives you option to find and "mark to remove" old videos, where N means **at least N days old videos**. This brings sxiv selection to mark videos for deletion
 ```
 subtube clean N
 ```
@@ -141,13 +145,13 @@ note that we use url of videos folder, not channel. This is because we find new 
 # SXIV integration
 if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to show video title as notification or remove thumbnails.
 
-After install of sxiv, create config folder and key handler script like this
+After sxiv installation, create config folder and key handler script like this
 ```
 mkdir -p ~/.config/sxiv/exec
 touch ~/.config/sxiv/exec/key-handler
 ```
 
-then add this content to a file  (If this case statement already exists, so just copy 4 lines inside.)
+then add this content to the file (If this case statement already exists, so just copy 3 lines inside.)
 
 ```
 #!/bin/bash
@@ -163,12 +167,14 @@ then make it executable
 chmod +x ~/.config/sxiv/exec/key-handler
 ```
 
-this allows you to use sxiv prefix (ctrl+x) in combination with key inside quotes to perform additional actions
+this allows you to use sxiv prefix (ctrl+x) followed by key inside quotes to perform additional actions
 
 # CRONTAB
 put these lines to you crontab file to download new thumbnails every 10 minutes.
-There is little issue with this showing notification on some systems. You might have to google a little to make it work.
+There is little issue with this showing notification on some systems.
+You might have to google a little to make it work.
 But once your crontab can regularly spawn `notify send 'title' 'body'`, it will work and refresh new videos regularly.
+If you can't `notify send` from crontab, it would simply update without notification.
 ```
 */10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube secret_update
 ```
