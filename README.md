@@ -123,6 +123,19 @@ adds new subscribed channel
 subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
 ```
 
+### clean
+gives you option to find and select to remove old videos, where N means **at least N days old videos**. This brings sxiv selection to mark videos for deletion
+```
+subtube clean N
+```
+
+### newest
+allows you to only pick from videos N minutes old (date when *subtube update* downloaded image). Very useful when you see notification but have many unseen videos to find it in.
+```
+subtube newest N
+```
+
+
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
 # SXIV integration
