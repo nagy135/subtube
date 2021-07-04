@@ -118,10 +118,15 @@ update(){
 }
 
 play(){
+    # this parts serves as override of THUMBNAILS folder
+    thumbnails=$THUMBNAILS
+    [ ! -z $1 ] \
+        && thumbnails=$1
+
     # bspwm users get floating sxiv centered in middle of the screen
     [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
-    chosen=$(sxiv -tbo $THUMBNAILS || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
+    chosen=$(sxiv -tbo $thumbnails || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
     [[ -z $chosen ]] && exit
     count=$(echo "$chosen" | wc -l)
     i=1
@@ -130,6 +135,7 @@ play(){
         file_name=$(basename $choice)
         mv $choice "/tmp/$file_name"
         choice="/tmp/$file_name"
+
         # get video hash
         id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
         if [[ $count -eq 1 ]]; then
@@ -167,21 +173,39 @@ notify_name(){
 
 }
 
-clean(){
+# 1st argument switch [clean|newest]
+time_selection(){
+    sel_type=$1
+    shift
+
     # make sure folder exists
-    tmp_thumbnails=/tmp/tmp_thumbnails
+    tmp_thumbnails="/tmp/tmp_thumbnails_$sel_type"
     mkdir -p $tmp_thumbnails
 
+    flag="-mtime"
+    argument=+$1
+    [[ $sel_type == "newest" ]] \
+        && flag="-mmin" \
+        && argument="-$1"
     # move all older than N days into the directory
-    find $THUMBNAILS -mtime +$1 -type f -exec mv -t $tmp_thumbnails {} +
+    find $THUMBNAILS \
+        $flag $argument \
+        -type f \
+        -exec mv -t $tmp_thumbnails {} +
 
     # delete marked
     chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
-    [[ ! -z $chosen ]] \
-        && rm $chosen
 
+    if [[ ! -z $chosen ]]; then
+        [[ $sel_type == "newest" ]] \
+            && play $tmp_thumbnails \
+            || rm $chosen
+    fi
     # move rest back
-    mv $tmp_thumbnails/* $THUMBNAILS
+    mv $tmp_thumbnails/* $THUMBNAILS 2> /dev/null
+
+    # remove empty folder
+    rmdir $tmp_thumbnails
 }
 
 get_thumbnail(){
@@ -219,7 +243,13 @@ elif [[ $1 == 'clean' ]]; then
         && echo "Pass number that specifies how many days" \
         "old videos to keep (delete older)" \
         && exit 1
-    clean $2
+    time_selection clean $2
+elif [[ $1 == 'newest' ]]; then
+    [ $# -lt 2 ] \
+        && echo "Pass number that specifies how many minutes" \
+        "old videos to show (for playing)" \
+        && exit 1
+    time_selection newest $2
 elif [[ $1 == 'add' ]]; then
     [ $# -lt 2 ] \
         && echo "Pass url to videos page!" \
