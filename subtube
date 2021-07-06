@@ -29,28 +29,25 @@ metadata(){
     url="https://www.youtube.com/watch?v=$id"
     TITLE=$(youtube-dl -e "$url")
 
-    [[ $1 == "name" ]] && notify-send -i $2 "$TITLE" && exit 0
+    [[ $1 == "name" ]] && #notify-send -i $2 "$TITLE" && exit 0
     duration=$(youtube-dl --get-duration $url)
-    notify-send -i $2 "$TITLE" "$duration"
+    #notify-send -i $2 "$TITLE" "$duration"
 }
 
 update(){
     # internet verification
     wget -q --spider http://google.com
     if [[ $? -gt 0 ]]; then
-        notify-send -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
+        #notify-send -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
         exit 1
     fi
     # avoid running twice at the same time
     if [[ -f /tmp/subtube_update.pid ]]; then
-        notify-send -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
+        #notify-send -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
         exit 0
     else
         touch /tmp/subtube_update.pid
     fi
-
-    # initialize progress bar (xob)
-    [[ $1 != "secret" ]] && progress_bar -d
 
     # init loop variables
     sub_i=0
@@ -59,9 +56,6 @@ update(){
     # loop over subscribed urls
     while read line; do
         sub_i=$((sub_i+1))
-
-        # notify progress
-        [[ $1 != "secret" ]] && progress_bar $sub_i $subcount 30
 
         # get first 10 video hashes parsed from youtube video page
         vid_ids=$(curl -s $line \
@@ -83,6 +77,8 @@ update(){
             2> /dev/null \
             | head)
 
+        echo "vid_ids" $vid_ids
+
         # loop over hashes
         while read vid_id; do
 
@@ -101,81 +97,23 @@ update(){
             title=$(youtube-dl -e $url)
             duration=$(youtube-dl --get-duration $url)
 
-            notify-send -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
+            #notify-send -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
         done <<< "$vid_ids"
 
 
     done < $SUBSCRIBES
-
-    # kill progress bar
-    if [[ $1 != "secret" ]]; then
-        notify-send -i 'none' -t 3000 "Subtube" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
-        progress_bar -k
-    fi
 
     # update finished, remove update flag
     rm /tmp/subtube_update.pid
 }
 
 play(){
-    # this parts serves as override of THUMBNAILS folder
-    thumbnails=$THUMBNAILS
-    [ ! -z $1 ] \
-        && thumbnails=$1
-
-    # bspwm users get floating sxiv centered in middle of the screen
-    [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
-
-    chosen=$(sxiv -tbo $thumbnails || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
-
-    if [[ -z $chosen ]]; then
-        [[ -z $1 ]] \
-            && exit \
-            || return
-    fi
-
-    count=$(echo "$chosen" | wc -l)
-    i=1
-    while read choice; do
-        # first move it so that its 'removed' instantly
-        file_name=$(basename $choice)
-        mv $choice "/tmp/$file_name"
-        choice="/tmp/$file_name"
-
-        # get video hash
-        id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
-        if [[ $count -eq 1 ]]; then
-            notify_name "Playing" $id $choice
-        else
-            notify_name "Playing $i/$count" $id $choice
-            i=$((i+1))
-        fi
-        rm $choice
-
-        url="https://www.youtube.com/watch?v=$id"
-        TITLE=$(youtube-dl -e "$url")
-
-        # integration with mpv_history, script of mine storing every seen video
-        [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
-
-        # try to play it until it works (maximum 3 times)
-        # mpv has youtube-dl hook and sometimes it work on second try
-        # if 3 times is not enough, you probably just need to update your 
-        # local youtube-dl (python -m pip install --upgrade youtube-dl)
-        n=0
-        until [ "$n" -ge 3 ]
-        do
-            [[ "$n" -ge 1 ]] && notify-send -t 1000 "MPV" "retry $n"
-            mpv "$url" &> /dev/null && break
-            n=$((n+1)) 
-            sleep 2
-        done
-    done <<< "$chosen"
+    imv $THUMBNAILS &
 }
 
 notify_name(){
     title=$(youtube-dl -e "https://www.youtube.com/watch?v=$2")
-    notify-send -i "$3" -t 4000 "$1" "$title"
+    #notify-send -i "$3" -t 4000 "$1" "$title"
 
 }
 
@@ -205,7 +143,7 @@ time_selection(){
     if [[ $sel_type == "newest" ]]; then
         play $tmp_thumbnails
     else
-        chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
+        # chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
         [[ ! -z $chosen ]] && rm $chosen
     fi
 
@@ -214,6 +152,32 @@ time_selection(){
 
     # remove empty folder
     rmdir $tmp_thumbnails
+}
+
+played(){
+    choice=$1
+    echo "choice" $choice
+    file_name=$(basename $choice)
+    mv $choice "/tmp/$file_name"
+    choice="/tmp/$file_name"
+
+    # get video hash
+    id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
+    if [[ $count -eq 1 ]]; then
+        notify_name "Playing" $id $choice
+    else
+        notify_name "Playing $i/$count" $id $choice
+        i=$((i+1))
+    fi
+    rm $choice
+
+    url="https://www.youtube.com/watch?v=$id"
+    TITLE=$(youtube-dl -e "$url")
+
+    # integration with mpv_history, script of mine storing every seen video
+    # [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
+
+    mpv "$url" &> /dev/null
 }
 
 get_thumbnail(){
@@ -246,6 +210,11 @@ elif [[ $1 == 'init' ]]; then
     update init
 elif [[ $1 == 'play' ]]; then
     play
+elif [[ $1 == 'played' ]]; then
+    [ $# -lt 2 ] \
+        && echo "Pass selected file" \
+        && exit 1
+    played $2
 elif [[ $1 == 'clean' ]]; then
     [ $# -lt 2 ] \
         && echo "Pass number that specifies how many days" \
@@ -284,8 +253,8 @@ else
     echo "    -s                       alias --secret"
     echo "  play                       sxiv picking dialog for playing all marked videos"
     echo "  init                       dont download thumbnails - for first time"
-    echo "  name path_to_file          notify-send video title"
-    echo "  name_length path_to_file   notify-send video title (with length)"
+    echo "  name path_to_file          #notify-send video title"
+    echo "  name_length path_to_file   #notify-send video title (with length)"
     echo "  clean N                    select videos older than N days to delete"
     echo "  newest N                   select videos more recent than N minutes to choose from"
     echo "  add \$url                  add subscriber (video page url of youtube channel)"
