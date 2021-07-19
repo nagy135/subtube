@@ -15,6 +15,9 @@ YOUTUBE_ICON=$PREFIX/subtube_youtube.png
 # location of thumbnails
 THUMBNAILS=$PREFIX/thumbnails
 
+# pidfile (update in progress)
+PIDFILE=/tmp/subtube_update.pid
+
 # variables for XOB (progress bar)
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
@@ -42,12 +45,15 @@ update(){
         exit 1
     fi
     # avoid running twice at the same time
-    if [[ -f /tmp/subtube_update.pid ]]; then
+    if [[ -f $PIDFILE ]]; then
         notify-send -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
         exit 0
     else
-        touch /tmp/subtube_update.pid
+        touch $PIDFILE
     fi
+
+    # cleanup if terminated by user
+    trap "rm $PIDFILE" SIGINT SIGTERM
 
     # initialize progress bar (xob)
     [[ $1 != "secret" ]] && progress_bar -d
@@ -114,7 +120,7 @@ update(){
     fi
 
     # update finished, remove update flag
-    rm /tmp/subtube_update.pid
+    rm $PIDFILE
 }
 
 play(){
