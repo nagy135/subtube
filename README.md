@@ -110,7 +110,7 @@ subtube init
 ```
 
 ### update
-reads subscribe list, downloads the newest 5 videos (if not seen yet) and allows you to play them (with play)
+reads subscribe list, downloads the newest 10 videos (if not seen yet) and allows you to play them (with play)
 ```
 subtube update
 ```
