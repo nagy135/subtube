@@ -195,3 +195,4 @@ If you use [xwayland](https://wiki.archlinux.org/title/wayland#XWayland) you sho
 
 # FUTURE WORK
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
+* clean up [wayland branch](https://github.com/nagy135/subtube/tree/wayland) mostly README
