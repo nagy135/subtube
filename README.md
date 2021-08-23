@@ -18,7 +18,7 @@ I rewrote this script with a lot of comments so feel free to fork and modify it 
 
 # DEPENDECIES
 
-This project has couple of dependecies you have to have. If you use arch or almost any normal linux distribution, this should be easy to get for you.
+This project has 3 dependecies you have to have and 2 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
 * [sxiv](https://github.com/muennich/sxiv)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
@@ -45,7 +45,7 @@ paru xob
 pip install --user youtube-dl
 sudo apt install sxiv, mpv, dunst
 ```
-youtube-viewer is not present on debian repo, install from source via link in *dependecies*. You will probably just need to run these commands
+Xob is not present on debian repo, install from source via link in *dependecies*. You will probably just need to run these commands
 
 ```
 cd /tmp # or anywhere else if you wish to preserve repository
