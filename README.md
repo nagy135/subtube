@@ -32,7 +32,7 @@ Without this dependency you wouldnt see any notifications, but it would still wo
 **XOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube update --secret` that doesnt spawn any progress bar anyway. Using `subtube play` would result in some error messages.
 
 ## ARCH
-on arch based distro, get dependencies like this
+on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-git/) in [install section](#install).
 ```
 pip install --user youtube-dl
 sudo pacman -S sxiv, mpv, dunst
