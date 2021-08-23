@@ -36,7 +36,7 @@ on arch based distro, get dependencies like this
 ```
 pip install --user youtube-dl
 sudo pacman -S sxiv, mpv, dunst
-yay -S xob
+paru xob
 ```
 
 ## DEBIAN/UBUNTU
@@ -68,6 +68,8 @@ Arch users can install from [AUR](https://aur.archlinux.org/packages/subtube-git
 ```
 paru subtube-git
 ```
+
+Or clone repository and install manually
 
 ```
 git clone https://github.com/nagy135/subtube
