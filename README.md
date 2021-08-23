@@ -64,6 +64,11 @@ pip install --user --update youtube-dl
 
 # INSTALL
 
+Arch users can install from [AUR](https://aur.archlinux.org/packages/subtube-git/) with any [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) (i m using `paru`)
+```
+paru subtube-git
+```
+
 ```
 git clone https://github.com/nagy135/subtube
 cd subtube
@@ -183,5 +188,4 @@ If you can't `notify send` from crontab, it would simply update without notifica
 i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
 
 # FUTURE WORK
-* TOP PRIORITY: AUR
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
