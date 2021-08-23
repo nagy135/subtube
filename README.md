@@ -118,7 +118,7 @@ or
 ```
 subtube update --secret
 ```
-to avoid notification (I use it with crontab 30 min interval)
+to avoid notification (I use it with [crontab 30 min interval](#crontab))
 
 ### play
 brings up sxiv thumbnail selection, where (default sxiv bindings) **m** marks thumbnail and **q** closes it and starts playing all of marked videos (if any).
@@ -188,6 +188,10 @@ If you can't `notify send` from crontab, it would simply update without notifica
 
 # BSPWM
 i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
+
+# WAYLAND
+My daily usage is currently on [wayland](https://wiki.archlinux.org/title/wayland).
+If you use [xwayland](https://wiki.archlinux.org/title/wayland#XWayland) you should be fine, but I am using wayland native programs instead, so check out [wayland branch]()https://github.com/nagy135/subtube/tree/wayland).
 
 # FUTURE WORK
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
