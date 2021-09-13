@@ -123,9 +123,6 @@ play(){
     [ ! -z $1 ] \
         && thumbnails=$1
 
-    # bspwm users get floating sxiv centered in middle of the screen
-    [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
-
     chosen=$(sxiv -tbo $thumbnails || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
 
     if [[ -z $chosen ]]; then
