@@ -117,6 +117,7 @@ update(){
     rm /tmp/subtube_update.pid
 }
 
+# 1st argument: play with browser
 play(){
     # this parts serves as override of THUMBNAILS folder
     thumbnails=$THUMBNAILS
@@ -155,18 +156,37 @@ play(){
         # integration with mpv_history, script of mine storing every seen video
         [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
 
-        # try to play it until it works (maximum 3 times)
-        # mpv has youtube-dl hook and sometimes it work on second try
-        # if 3 times is not enough, you probably just need to update your 
-        # local youtube-dl (python -m pip install --upgrade youtube-dl)
-        n=0
-        until [ "$n" -ge 3 ]
-        do
-            [[ "$n" -ge 1 ]] && notify-send -t 1000 "MPV" "retry $n"
-            mpv "$url" &> /dev/null && break
-            n=$((n+1)) 
-            sleep 2
-        done
+        if [ $1 == "browser" ]; then
+            if [ -z "${BROWSER+x}" ]; then
+                for browser in \
+                    chromium \
+                    google-chrome-stable \
+                    google-chrome-unstable \
+                    google-chrome-beta \
+                    firefox \
+                    firefox-nightly
+                do
+                    command -v $browser >/dev/null 2>&1 \
+                        && $browser "$url" \
+                        && break
+                done
+            else
+                $BROWSER "$url"
+            fi
+        else
+            # try to play it until it works (maximum 3 times)
+            # mpv has youtube-dl hook and sometimes it work on second try
+            # if 3 times is not enough, you probably just need to update your 
+            # local youtube-dl (python -m pip install --upgrade youtube-dl)
+            n=0
+            until [ "$n" -ge 3 ]
+            do
+                [[ "$n" -ge 1 ]] && notify-send -t 1000 "MPV" "retry $n"
+                mpv "$url" &> /dev/null && break
+                n=$((n+1)) 
+                sleep 2
+            done
+        fi
     done <<< "$chosen"
 }
 
@@ -242,7 +262,11 @@ if [[ $1 == 'update' ]]; then
 elif [[ $1 == 'init' ]]; then
     update init
 elif [[ $1 == 'play' ]]; then
-    play
+    arg=""
+    if [[ $2 == "-b" ]] || [[ $2 == "--browser" ]]; then
+        arg="browser"
+    fi
+    play $arg
 elif [[ $1 == 'clean' ]]; then
     [ $# -lt 2 ] \
         && echo "Pass number that specifies how many days" \
@@ -280,6 +304,8 @@ else
     echo "    --secret                 update database without notifications (for crontab)"
     echo "    -s                       alias --secret"
     echo "  play                       sxiv picking dialog for playing all marked videos"
+    echo '    --browser                play with your browser instead (guess or use $BROWSER)'
+    echo "    -b                       alias --browser"
     echo "  init                       dont download thumbnails - for first time"
     echo "  name path_to_file          notify-send video title"
     echo "  name_length path_to_file   notify-send video title (with length)"
