@@ -117,11 +117,12 @@ update(){
     rm /tmp/subtube_update.pid
 }
 
-# 1st argument: play with browser
+# 1st argument: thumbnails folder
+# 2st argument: play with browser
 play(){
     # this parts serves as override of THUMBNAILS folder
     thumbnails=$THUMBNAILS
-    [ ! -z $1 ] \
+    [ ! -z "$1" ] \
         && thumbnails=$1
 
     chosen=$(sxiv -tbo $thumbnails || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
@@ -156,10 +157,11 @@ play(){
         # integration with mpv_history, script of mine storing every seen video
         [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
 
-        if [ $1 == "browser" ]; then
+        if [ $2 == "browser" ]; then
             if [ -z "${BROWSER+x}" ]; then
                 for browser in \
                     chromium \
+                    chrome \
                     google-chrome-stable \
                     google-chrome-unstable \
                     google-chrome-beta \
@@ -167,6 +169,7 @@ play(){
                     firefox-nightly
                 do
                     command -v $browser >/dev/null 2>&1 \
+                        && echo "playing with $browser" \
                         && $browser "$url" \
                         && break
                 done
@@ -266,7 +269,7 @@ elif [[ $1 == 'play' ]]; then
     if [[ $2 == "-b" ]] || [[ $2 == "--browser" ]]; then
         arg="browser"
     fi
-    play $arg
+    play "" $arg
 elif [[ $1 == 'clean' ]]; then
     [ $# -lt 2 ] \
         && echo "Pass number that specifies how many days" \
