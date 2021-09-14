@@ -109,7 +109,8 @@ subtube update
 ```
 or
 ```
-subtube secret_update
+subtube update --secret
+subtube update -s
 ```
 to avoid notification (I use it with crontab 30 min interval)
 
@@ -118,6 +119,17 @@ brings up sxiv thumbnail selection, where (default sxiv bindings) **m** marks th
 ```
 subtube play
 ```
+or
+```
+subtube play --browser
+subtube play -b
+```
+to play with browser instead.
+Either specify with env variable (from env setting config like `~/.zshenv`) or manually like
+```
+BROWSER=google-chrome-stable subtube play -b
+```
+or let script try few popular options in random order
 
 ### add
 adds new subscribed channel.
