@@ -16,9 +16,9 @@ Screenshot above has my modified fork of [sxiv](https://github.com/muennich/sxiv
 
 I rewrote this script with a lot of comments so feel free to fork and modify it to your liking
 
-# DEPENDECIES
+# DEPENDENCIES
 
-This project has 3 dependecies you have to have and 2 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
+This project has 3 dependencies you have to have and 2 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
 * [sxiv](https://github.com/muennich/sxiv)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
@@ -36,8 +36,7 @@ Without this dependency you wouldnt see any notifications, but it would still wo
 ## ARCH
 on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-git/) in [install section](#install).
 ```
-pip install --user youtube-dl
-sudo pacman -S sxiv, mpv, dunst
+sudo pacman -S sxiv mpv dunst youtube-dl
 paru xob
 ```
 
@@ -45,9 +44,9 @@ paru xob
 
 ```
 pip install --user youtube-dl
-sudo apt install sxiv, mpv, dunst
+sudo apt install sxiv mpv dunst
 ```
-Xob is not present on debian repo, install from source via link in *dependecies*. You will probably just need to run these commands
+Xob is not present on debian repo, install from source via link in *dependencies*. You will probably just need to run these commands
 
 ```
 cd /tmp # or anywhere else if you wish to preserve repository
@@ -66,7 +65,7 @@ pip install --user --update youtube-dl
 
 # INSTALL
 
-Arch users can install from [AUR](https://aur.archlinux.org/packages/subtube-git/) with any [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) (i m using `paru`)
+Arch users can install from [AUR](https://aur.archlinux.org/packages/subtube-git/) with any [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) (i'm using `paru`)
 ```
 paru subtube-git
 ```
