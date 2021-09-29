@@ -110,7 +110,7 @@ update(){
         while read vid_id; do
 
             # filter out already seen ones
-            [[ ! -z $(grep -e "^$vid_id$" $SEEN) ]] && continue
+            [ -n "$(grep -e "^$vid_id$" $SEEN)" ] && continue
 
             # if problem occured during parsing 
             [[ -z "$vid_id" ]] && echo "error parsing given url: $line" && continue
@@ -145,8 +145,7 @@ update(){
 play(){
     # this parts serves as override of THUMBNAILS folder
     thumbnails="$THUMBNAILS"
-    [ ! -z "$1" ] \
-        && thumbnails="$1"
+    [ -n "$1" ] && thumbnails="$1"
 
     # bspwm users get floating sxiv centered in middle of the screen
     [[ $($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
@@ -252,7 +251,7 @@ time_selection(){
         play $tmp_thumbnails
     else
         chosen=$($img_view -tbo $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
-        [[ ! -z $chosen ]] && rm $chosen
+        [ -n "$chosen" ] && rm $chosen
     fi
 
     # move rest back
