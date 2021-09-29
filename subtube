@@ -32,6 +32,8 @@ check_dep(){
 
 noti="$(check_dep notify-send)"
 wmctrl="$(check_dep wmctrl)"
+img_view="$(check_dep nsxiv)"
+[ "$img_view" = ":" ] && img_view="sxiv"
 
 add_subscriber(){
     echo $1 >> "$SUBSCRIBES"
@@ -144,7 +146,7 @@ play(){
     # bspwm users get floating sxiv centered in middle of the screen
     [[ $($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
-    chosen=$(sxiv -tbo "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
+    chosen=$($img_view -tbo "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
     if [[ -z $chosen ]]; then
         [[ -z $1 ]] \
@@ -240,11 +242,11 @@ time_selection(){
         -type f \
         -exec mv -t $tmp_thumbnails {} +
 
-    # perform sxiv selection
+    # perform (n)sxiv selection
     if [[ $sel_type == "newest" ]]; then
         play $tmp_thumbnails
     else
-        chosen=$(sxiv -tbo $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
+        chosen=$($img_view -tbo $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
         [[ ! -z $chosen ]] && rm $chosen
     fi
 
