@@ -70,7 +70,7 @@ update(){
 
     # init loop variables
     sub_i=0
-    subcount=$(cat "$SUBSCRIBES" | wc -l)
+    subcount=$(wc -l < "$SUBSCRIBES")
 
     # loop over subscribed urls
     while read line; do
@@ -264,7 +264,7 @@ progress_bar(){
     if [[ $1 == '-d' ]]; then
         mkfifo $fifo
         chmod 766 $fifo
-        subcount=$(cat "$SUBSCRIBES" | wc -l)
+        subcount=$(wc -l < "$SUBSCRIBES")
         tail -f $fifo | xob -t 5000 -s subtube -m $subcount &> /dev/null &
         progressbar_pid=$!
     elif [[ $1 == '-k' ]]; then
