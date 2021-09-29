@@ -23,7 +23,7 @@ fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
 check_dep(){
-    if command -v "$1"; then
+    if command -v "$1" >/dev/null; then
         echo "$1"
     else
         echo ":"
