@@ -3,17 +3,17 @@
 PREFIX=/usr/share/subtube/resources
 
 # list of seen video hashes
-SEEN=$PREFIX/seen.lst
+SEEN="$PREFIX/seen.lst"
 
 # storage of data regarding subscribed channels
-SUBSCRIBES=$PREFIX/subscribes
+SUBSCRIBES="$PREFIX/subscribes"
 
 # icons
-PLAYING_ICON=$PREFIX/subtube-playing.png
-YOUTUBE_ICON=$PREFIX/subtube_youtube.png
+PLAYING_ICON="$PREFIX/subtube-playing.png"
+YOUTUBE_ICON="$PREFIX/subtube_youtube.png"
 
 # location of thumbnails
-THUMBNAILS=$PREFIX/thumbnails
+THUMBNAILS="$PREFIX/thumbnails"
 
 # pidfile (update in progress)
 PIDFILE=/tmp/subtube_update.pid
@@ -34,7 +34,7 @@ noti="$(check_dep notify-send)"
 wmctrl="$(check_dep wmctrl)"
 
 add_subscriber(){
-    echo $1 >> $SUBSCRIBES
+    echo $1 >> "$SUBSCRIBES"
 }
 
 metadata(){
@@ -59,7 +59,7 @@ update(){
         $noti -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
         exit 0
     else
-        touch $PIDFILE
+        touch "$PIDFILE"
     fi
 
     # cleanup if terminated by user
@@ -70,7 +70,7 @@ update(){
 
     # init loop variables
     sub_i=0
-    subcount=$(cat $SUBSCRIBES | wc -l)
+    subcount=$(cat "$SUBSCRIBES" | wc -l)
 
     # loop over subscribed urls
     while read line; do
@@ -117,34 +117,34 @@ update(){
             title=$(youtube-dl -e $url)
             duration=$(youtube-dl --get-duration $url)
 
-            $noti -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
+            $noti -i 'none' -t 3000 "$title" "$duration" -u critical -i "$THUMBNAILS/$vid_id.jpg"
         done <<< "$vid_ids"
 
 
-    done < $SUBSCRIBES
+    done < "$SUBSCRIBES"
 
     # kill progress bar
     if [[ $1 != "secret" ]]; then
-        $noti -i 'none' -t 3000 "Subtube" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
+        $noti -i 'none' -t 3000 "Subtube" "$(find "$THUMBNAILS"/* | wc -l) unseen video(s)"
         progress_bar -k
     fi
 
     # update finished, remove update flag
-    rm $PIDFILE
+    rm "$PIDFILE"
 }
 
 # 1st argument: thumbnails folder
 # 2st argument: play with browser
 play(){
     # this parts serves as override of THUMBNAILS folder
-    thumbnails=$THUMBNAILS
+    thumbnails="$THUMBNAILS"
     [ ! -z "$1" ] \
-        && thumbnails=$1
+        && thumbnails="$1"
 
     # bspwm users get floating sxiv centered in middle of the screen
     [[ $($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
-    chosen=$(sxiv -tbo $thumbnails || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
+    chosen=$(sxiv -tbo "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
     if [[ -z $chosen ]]; then
         [[ -z $1 ]] \
@@ -235,7 +235,7 @@ time_selection(){
         && argument="-$1"
 
     # move all older than N days into the directory
-    find $THUMBNAILS \
+    find "$THUMBNAILS" \
         $flag $argument \
         -type f \
         -exec mv -t $tmp_thumbnails {} +
@@ -249,14 +249,14 @@ time_selection(){
     fi
 
     # move rest back
-    mv $tmp_thumbnails/* $THUMBNAILS 2> /dev/null
+    mv $tmp_thumbnails/* "$THUMBNAILS" 2> /dev/null
 
     # remove empty folder
     rmdir $tmp_thumbnails
 }
 
 get_thumbnail(){
-    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
+    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O "$THUMBNAILS/$1.jpg"
 }
 
 progress_bar(){
@@ -264,7 +264,7 @@ progress_bar(){
     if [[ $1 == '-d' ]]; then
         mkfifo $fifo
         chmod 766 $fifo
-        subcount=$(cat $SUBSCRIBES | wc -l)
+        subcount=$(cat "$SUBSCRIBES" | wc -l)
         tail -f $fifo | xob -t 5000 -s subtube -m $subcount &> /dev/null &
         progressbar_pid=$!
     elif [[ $1 == '-k' ]]; then
