@@ -150,7 +150,7 @@ play(){
     # bspwm users get floating sxiv centered in middle of the screen
     [[ $($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
-    chosen=$($img_view -tbo "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
+    chosen=$("$img_view" -tbop "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
     if [[ -z $chosen ]]; then
         [[ -z $1 ]] \
@@ -250,7 +250,7 @@ time_selection(){
     if [[ $sel_type == "newest" ]]; then
         play $tmp_thumbnails
     else
-        chosen=$($img_view -tbo $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
+        chosen=$("$img_view" -tbop $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
         [ -n "$chosen" ] && rm $chosen
     fi
 
