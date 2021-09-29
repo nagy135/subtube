@@ -35,6 +35,11 @@ wmctrl="$(check_dep wmctrl)"
 img_view="$(check_dep nsxiv)"
 [ "$img_view" = ":" ] && img_view="sxiv"
 
+die(){
+    [ -n "$1" ] && printf "$*\n" >&2
+    exit 1
+}
+
 add_subscriber(){
     echo $1 >> "$SUBSCRIBES"
 }
@@ -293,31 +298,21 @@ elif [[ $1 == 'play' ]]; then
     fi
     play "" $arg
 elif [[ $1 == 'clean' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass number that specifies how many days" \
-        "old videos to keep (delete older)" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass number that specifies how many days" \
+        "old videos to keep (delete older)"
     time_selection clean $2
 elif [[ $1 == 'newest' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass number that specifies how many minutes" \
-        "old videos to show (for playing)" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass number that specifies how many minutes" \
+        "old videos to show (for playing)"
     time_selection newest $2
 elif [[ $1 == 'add' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass url to videos page!" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass url to videos page!"
     add_subscriber $2
 elif [[ $1 == 'name' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass path to file with video id!" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name $2
 elif [[ $1 == 'name_length' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass path to file with video id!" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name_length $2
 else
     echo "Usage: subtube [OPTION]"
