@@ -16,36 +16,37 @@ Screenshot above has my modified fork of [sxiv](https://github.com/muennich/sxiv
 
 I rewrote this script with a lot of comments so feel free to fork and modify it to your liking
 
-# DEPENDECIES
+# DEPENDENCIES
 
-This project has couple of dependecies you have to have. If you use arch or almost any normal linux distribution, this should be easy to get for you.
+This project has 3 dependencies you have to have and 3 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
-* [sxiv](https://github.com/muennich/sxiv)
+* [sxiv](https://github.com/muennich/sxiv) or [nsxiv](https://github.com/nsxiv/nsxiv)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 * [mpv](https://github.com/mpv-player/mpv)
-* [dunst](https://github.com/dunst-project/dunst)
-* [xob](https://github.com/florentc/xob)
+* [mako](https://github.com/emersion/mako)
+* [wob](https://github.com/francma/wob)
+* [jq](https://github.com/stedolan/jq)
 
 First 3 are core, last 2 are optional.
-**Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
+**Mako** is simply notification daemon that is heavily used. If you dont install mako, you still get some notification (because you probably have different one).
 Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
-**XOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube secret_update` that doesnt spawn any progress bar anyway. Using `subtube play` would result in some error messages.
+**WOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube update--secret` that doesnt spawn any progress bar anyway. Using `subtube play` would result in some error messages.
 
 ## ARCH
-on arch based distro, get dependencies like this
+on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-wayland-git/) in [install section](#install).
 ```
-pip install --user youtube-dl
-sudo pacman -S sxiv, mpv, dunst
-yay -S xob
+sudo pacman -S sxiv mpv mako youtube-dl
+paru wob
 ```
 
 ## DEBIAN/UBUNTU
 
 ```
 pip install --user youtube-dl
-sudo apt install sxiv, mpv, dunst
+sudo apt install sxiv mpv
 ```
-youtube-viewer is not present on debian repo, install from source via link in *dependecies*. You will probably just need to run these commands
+Unless you use minimal install, you should have notification-daemon.
+Wob will probably have to be installed from source (link in dependencies).
 
 ```
 cd /tmp # or anywhere else if you wish to preserve repository
@@ -63,6 +64,13 @@ pip install --user --update youtube-dl
 
 
 # INSTALL
+
+Arch users can install from [AUR](https://aur.archlinux.org/packages/subtube-wayland-git/) with any [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) (i'm using `paru`)
+```
+paru subtube-git
+```
+
+Or clone repository and install manually
 
 ```
 git clone https://github.com/nagy135/subtube
@@ -103,7 +111,7 @@ subtube init
 ```
 
 ### update
-reads subscribe list, downloads the newest 5 videos (if not seen yet) and allows you to play them (with play)
+reads subscribe list, downloads the newest 10 videos (if not seen yet) and allows you to play them (with play)
 ```
 subtube update
 ```
@@ -112,7 +120,7 @@ or
 subtube update --secret
 subtube update -s
 ```
-to avoid notification (I use it with crontab 30 min interval)
+to avoid notification (I use it with [crontab 30 min interval](#crontab))
 
 ### play
 brings up sxiv thumbnail selection, where (default sxiv bindings) **m** marks thumbnail and **q** closes it and starts playing all of marked videos (if any).
@@ -188,12 +196,12 @@ You might have to google a little to make it work.
 But once your crontab can regularly spawn `notify send 'title' 'body'`, it will work and refresh new videos regularly.
 If you can't `notify send` from crontab, it would simply update without notification.
 ```
-*/10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube secret_update
+*/10 * * * *  XDG_RUNTIME_DIR=/run/user/$(id -u) subtube update --secret
 ```
 
-# BSPWM
-i m using it on bspwm, so there is "one-shot sticky floating small middle screen" rule with notification if too many thumbnails to fit
+# WAYLAND
+My daily usage is currently on [wayland](https://wiki.archlinux.org/title/wayland).
+If you use [xwayland](https://wiki.archlinux.org/title/wayland#XWayland) you should be fine, but I am using wayland native programs instead, so check out [wayland branch](https://github.com/nagy135/subtube/tree/wayland).
 
 # FUTURE WORK
-* TOP PRIORITY: AUR
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
