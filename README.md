@@ -38,7 +38,7 @@ Without this dependency you wouldnt see any notifications, but it would still wo
 ## ARCH
 on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-git/) in [install section](#install).
 ```
-sudo pacman -S sxiv mpv dunst youtube-dl
+sudo pacman -S sxiv mpv dunst youtube-dl jq
 paru xob
 ```
 
@@ -46,7 +46,7 @@ paru xob
 
 ```
 pip install --user youtube-dl
-sudo apt install sxiv mpv dunst
+sudo apt install sxiv mpv dunst jq
 ```
 Xob is not present on debian repo, install from source via link in *dependencies*. You will probably just need to run these commands
 
