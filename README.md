@@ -20,7 +20,7 @@ I rewrote this script with a lot of comments so feel free to fork and modify it 
 
 This project has 3 dependencies you have to have and 3 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
-* [sxiv](https://github.com/muennich/sxiv)
+* [sxiv](https://github.com/muennich/sxiv) or [nsxiv](https://github.com/nsxiv/nsxiv)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 * [mpv](https://github.com/mpv-player/mpv)
 * [dunst](https://github.com/dunst-project/dunst)
