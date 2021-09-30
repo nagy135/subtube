@@ -36,7 +36,7 @@ Without this dependency you wouldnt see any notifications, but it would still wo
 ## ARCH
 on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-wayland-git/) in [install section](#install).
 ```
-sudo pacman -S sxiv mpv mako youtube-dl
+sudo pacman -S sxiv mpv mako youtube-dl jq
 paru wob
 ```
 
@@ -44,17 +44,18 @@ paru wob
 
 ```
 pip install --user youtube-dl
-sudo apt install sxiv mpv
+sudo apt install sxiv mpv jq
 ```
 Unless you use minimal install, you should have notification-daemon.
 Wob will probably have to be installed from source (link in dependencies).
 
 ```
 cd /tmp # or anywhere else if you wish to preserve repository
-git clone https://github.com/florentc/xob
-cd xob
-make
-sudo make install
+git clone git@github.com:francma/wob.git
+cd wob
+meson build
+ninja -C build
+sudo ninja -C build install
 ```
 
 # UPDATE
