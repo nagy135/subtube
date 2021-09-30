@@ -3,22 +3,22 @@
 PREFIX = /usr
 
 install:
-	mkdir -p $(PREFIX)/bin
-	cp subtube $(PREFIX)/bin/subtube
-	chmod +x $(PREFIX)/bin/subtube
-	mkdir -p $(PREFIX)/share/subtube
-	cp -R resources $(PREFIX)/share/subtube
-	chmod 777 -R $(PREFIX)/share/subtube
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp subtube $(DESTDIR)$(PREFIX)/bin/subtube
+	chmod +x $(DESTDIR)$(PREFIX)/bin/subtube
+	mkdir -p $(DESTDIR)$(PREFIX)/share/subtube
+	cp -R resources $(DESTDIR)$(PREFIX)/share/subtube
+	chmod 777 -R $(DESTDIR)$(PREFIX)/share/subtube
 
 reinstall:
-	mkdir -p $(PREFIX)/bin
-	cp subtube $(PREFIX)/bin/subtube
-	chmod +x $(PREFIX)/bin/subtube
-	mkdir -p $(PREFIX)/share/subtube
-	chmod 777 -R $(PREFIX)/share/subtube
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp subtube $(DESTDIR)$(PREFIX)/bin/subtube
+	chmod +x $(DESTDIR)$(PREFIX)/bin/subtube
+	mkdir -p $(DESTDIR)$(PREFIX)/share/subtube
+	chmod 777 -R $(DESTDIR)$(PREFIX)/share/subtube
 
 uninstall:
-	rm $(PREFIX)/bin/subtube
-	rm -rf $(PREFIX)/share/subtube
+	rm $(DESTDIR)$(PREFIX)/bin/subtube
+	rm -rf $(DESTDIR)$(PREFIX)/share/subtube
 
 .PHONY: install uninstall reinstall
