@@ -206,7 +206,7 @@ i m using it on bspwm, so there is "one-shot sticky floating small middle screen
 
 # WAYLAND
 My daily usage is currently on [wayland](https://wiki.archlinux.org/title/wayland).
-If you use [xwayland](https://wiki.archlinux.org/title/wayland#XWayland) you should be fine, but I am using wayland native programs instead, so check out [wayland branch](https://github.com/nagy135/subtube/tree/wayland).
+If you use [xwayland](https://wiki.archlinux.org/title/wayland#XWayland) you should be fine but on [wayland branch](https://github.com/nagy135/subtube/tree/wayland) there are some wayland related changes. We also have **wayland AUR package** in [install section](#install)
 
 # FUTURE WORK
 * make repo of my "mpv history" script, that can play already played videos via rofi launcher
