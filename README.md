@@ -26,6 +26,7 @@ This project has 3 dependencies you have to have and 3 optional ones. If you use
 * [dunst](https://github.com/dunst-project/dunst)
 * [xob](https://github.com/florentc/xob)
 * [wmctrl](https://github.com/dancor/wmctrl)
+* [jq](https://github.com/stedolan/jq)
 
 First 3 are core, last 3 are optional.
 **Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
