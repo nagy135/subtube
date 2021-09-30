@@ -3,17 +3,17 @@
 PREFIX=/usr/share/subtube/resources
 
 # list of seen video hashes
-SEEN=$PREFIX/seen.lst
+SEEN="$PREFIX/seen.lst"
 
 # storage of data regarding subscribed channels
-SUBSCRIBES=$PREFIX/subscribes
+SUBSCRIBES="$PREFIX/subscribes"
 
 # icons
-PLAYING_ICON=$PREFIX/subtube-playing.png
-YOUTUBE_ICON=$PREFIX/subtube_youtube.png
+PLAYING_ICON="$PREFIX/subtube-playing.png"
+YOUTUBE_ICON="$PREFIX/subtube_youtube.png"
 
 # location of thumbnails
-THUMBNAILS=$PREFIX/thumbnails
+THUMBNAILS="$PREFIX/thumbnails"
 
 # pidfile (update in progress)
 PIDFILE=/tmp/subtube_update.pid
@@ -22,9 +22,26 @@ PIDFILE=/tmp/subtube_update.pid
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
+check_dep(){
+    if command -v "$1" >/dev/null; then
+        echo "$1"
+    else
+        echo ":"
+    fi
+}
+
+noti="$(check_dep notify-send)"
+wmctrl="$(check_dep wmctrl)"
+img_view="$(check_dep nsxiv)"
+[ "$img_view" = ":" ] && img_view="sxiv"
+
+die(){
+    [ -n "$1" ] && printf "$*\n" >&2
+    exit 1
+}
 
 add_subscriber(){
-    echo $1 >> $SUBSCRIBES
+    echo $1 >> "$SUBSCRIBES"
 }
 
 metadata(){
@@ -32,24 +49,24 @@ metadata(){
     url="https://www.youtube.com/watch?v=$id"
     TITLE=$(youtube-dl -e "$url")
 
-    [[ $1 == "name" ]] && notify-send -i $2 "$TITLE" && exit 0
+    [[ $1 == "name" ]] && $noti -i $2 "$TITLE" && exit 0
     duration=$(youtube-dl --get-duration $url)
-    notify-send -i $2 "$TITLE" "$duration"
+    $noti -i $2 "$TITLE" "$duration"
 }
 
 update(){
     # internet verification
     wget -q --spider http://google.com
     if [[ $? -gt 0 ]]; then
-        notify-send -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
+        $noti -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
         exit 1
     fi
     # avoid running twice at the same time
     if [[ -f $PIDFILE ]]; then
-        notify-send -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
+        $noti -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
         exit 0
     else
-        touch $PIDFILE
+        touch "$PIDFILE"
     fi
 
     # cleanup if terminated by user
@@ -60,7 +77,7 @@ update(){
 
     # init loop variables
     sub_i=0
-    subcount=$(cat $SUBSCRIBES | wc -l)
+    subcount=$(wc -l < "$SUBSCRIBES")
 
     # loop over subscribed urls
     while read line; do
@@ -93,7 +110,7 @@ update(){
         while read vid_id; do
 
             # filter out already seen ones
-            [[ ! -z $(grep -e "^$vid_id$" $SEEN) ]] && continue
+            [ -n "$(grep -e "^$vid_id$" $SEEN)" ] && continue
 
             # if problem occured during parsing 
             [[ -z "$vid_id" ]] && echo "error parsing given url: $line" && continue
@@ -107,34 +124,33 @@ update(){
             title=$(youtube-dl -e $url)
             duration=$(youtube-dl --get-duration $url)
 
-            notify-send -i 'none' -t 3000 "$title" "$duration" -u critical -i $THUMBNAILS/$vid_id.jpg
+            $noti -i 'none' -t 3000 "$title" "$duration" -u critical -i "$THUMBNAILS/$vid_id.jpg"
         done <<< "$vid_ids"
 
 
-    done < $SUBSCRIBES
+    done < "$SUBSCRIBES"
 
     # kill progress bar
     if [[ $1 != "secret" ]]; then
-        notify-send -i 'none' -t 3000 "Subtube" "$(find $THUMBNAILS/* | wc -l) unseen video(s)"
+        $noti -i 'none' -t 3000 "Subtube" "$(find "$THUMBNAILS"/* | wc -l) unseen video(s)"
         progress_bar -k
     fi
 
     # update finished, remove update flag
-    rm $PIDFILE
+    rm "$PIDFILE"
 }
 
 # 1st argument: thumbnails folder
 # 2st argument: play with browser
 play(){
     # this parts serves as override of THUMBNAILS folder
-    thumbnails=$THUMBNAILS
-    [ ! -z "$1" ] \
-        && thumbnails=$1
+    thumbnails="$THUMBNAILS"
+    [ -n "$1" ] && thumbnails="$1"
 
     # bspwm users get floating sxiv centered in middle of the screen
-    [[ $(wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
+    [[ $($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
-    chosen=$(sxiv -tbo $thumbnails || notify-send -i 'none' -t 3000 "Subtube" "No videos to play")
+    chosen=$("$img_view" -tbop "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
     if [[ -z $chosen ]]; then
         [[ -z $1 ]] \
@@ -193,7 +209,7 @@ play(){
             n=0
             until [ "$n" -ge 3 ]
             do
-                [[ "$n" -ge 1 ]] && notify-send -t 1000 "MPV" "retry $n"
+                [[ "$n" -ge 1 ]] && $noti -t 1000 "MPV" "retry $n"
                 mpv "$url" &> /dev/null && break
                 n=$((n+1)) 
                 sleep 2
@@ -204,7 +220,7 @@ play(){
 
 notify_name(){
     title=$(youtube-dl -e "https://www.youtube.com/watch?v=$2")
-    notify-send -i "$3" -t 4000 "$1" "$title"
+    $noti -i "$3" -t 4000 "$1" "$title"
 
 }
 
@@ -225,35 +241,36 @@ time_selection(){
         && argument="-$1"
 
     # move all older than N days into the directory
-    find $THUMBNAILS \
+    find "$THUMBNAILS" \
         $flag $argument \
         -type f \
         -exec mv -t $tmp_thumbnails {} +
 
-    # perform sxiv selection
+    # perform (n)sxiv selection
     if [[ $sel_type == "newest" ]]; then
         play $tmp_thumbnails
     else
-        chosen=$(sxiv -tbo $tmp_thumbnails || notify-send -i 'none' -t 2000 "Subtube" "No video deleted")
-        [[ ! -z $chosen ]] && rm $chosen
+        chosen=$("$img_view" -tbop $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
+        [ -n "$chosen" ] && rm $chosen
     fi
 
     # move rest back
-    mv $tmp_thumbnails/* $THUMBNAILS 2> /dev/null
+    mv $tmp_thumbnails/* "$THUMBNAILS" 2> /dev/null
 
     # remove empty folder
     rmdir $tmp_thumbnails
 }
 
 get_thumbnail(){
-    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O $THUMBNAILS/$1.jpg
+    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O "$THUMBNAILS/$1.jpg"
 }
 
 progress_bar(){
+    command -v xob >/dev/null || return
     if [[ $1 == '-d' ]]; then
         mkfifo $fifo
         chmod 766 $fifo
-        subcount=$(cat $SUBSCRIBES | wc -l)
+        subcount=$(wc -l < "$SUBSCRIBES")
         tail -f $fifo | xob -t 5000 -s subtube -m $subcount &> /dev/null &
         progressbar_pid=$!
     elif [[ $1 == '-k' ]]; then
@@ -280,31 +297,21 @@ elif [[ $1 == 'play' ]]; then
     fi
     play "" $arg
 elif [[ $1 == 'clean' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass number that specifies how many days" \
-        "old videos to keep (delete older)" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass number that specifies how many days" \
+        "old videos to keep (delete older)"
     time_selection clean $2
 elif [[ $1 == 'newest' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass number that specifies how many minutes" \
-        "old videos to show (for playing)" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass number that specifies how many minutes" \
+        "old videos to show (for playing)"
     time_selection newest $2
 elif [[ $1 == 'add' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass url to videos page!" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass url to videos page!"
     add_subscriber $2
 elif [[ $1 == 'name' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass path to file with video id!" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name $2
 elif [[ $1 == 'name_length' ]]; then
-    [ $# -lt 2 ] \
-        && echo "Pass path to file with video id!" \
-        && exit 1
+    [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name_length $2
 else
     echo "Usage: subtube [OPTION]"
@@ -323,5 +330,5 @@ else
     echo "  name_length path_to_file   notify-send video title (with length)"
     echo "  clean N                    select videos older than N days to delete"
     echo "  newest N                   select videos more recent than N minutes to choose from"
-    echo "  add \$url                  add subscriber (video page url of youtube channel)"
+    echo '  add $url                   add subscriber (video page url of youtube channel)'
 fi
