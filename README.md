@@ -18,14 +18,15 @@ I rewrote this script with a lot of comments so feel free to fork and modify it 
 
 # DEPENDENCIES
 
-This project has 3 dependencies you have to have and 3 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
+This project has 4 dependencies and 2 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
 * [sxiv](https://github.com/muennich/sxiv) or [nsxiv](https://github.com/nsxiv/nsxiv)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 * [mpv](https://github.com/mpv-player/mpv)
+* [jq](https://github.com/stedolan/jq)
+* ===
 * [mako](https://github.com/emersion/mako)
 * [wob](https://github.com/francma/wob)
-* [jq](https://github.com/stedolan/jq)
 
 First 3 are core, last 2 are optional.
 **Mako** is simply notification daemon that is heavily used. If you dont install mako, you still get some notification (because you probably have different one).
