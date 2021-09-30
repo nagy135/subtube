@@ -28,7 +28,7 @@ This project has 4 dependencies and 2 optional ones. If you use arch or almost a
 * [mako](https://github.com/emersion/mako)
 * [wob](https://github.com/francma/wob)
 
-First 3 are core, last 2 are optional.
+First 4 are core, last 2 are optional.
 **Mako** is simply notification daemon that is heavily used. If you dont install mako, you still get some notification (because you probably have different one).
 Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
 **WOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube update--secret` that doesnt spawn any progress bar anyway. Using `subtube play` would result in some error messages.
