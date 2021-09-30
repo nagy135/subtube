@@ -69,7 +69,7 @@ pip install --user --update youtube-dl
 
 Arch users can install from [AUR](https://aur.archlinux.org/packages/subtube-wayland-git/) with any [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) (i'm using `paru`)
 ```
-paru subtube-git
+paru subtube-wayland-git
 ```
 
 Or clone repository and install manually
