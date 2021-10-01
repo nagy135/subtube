@@ -132,7 +132,7 @@ update(){
 
     # kill progress bar
     if [[ $1 != "secret" ]]; then
-        $noti -i 'none' -t 3000 "Subtube" "$(find "$THUMBNAILS"/* | wc -l) unseen video(s)"
+        $noti -i 'none' -t 3000 "Subtube" "$(find "$THUMBNAILS" -type f | wc -l) unseen video(s)"
         progress_bar -k
     fi
 
