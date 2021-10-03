@@ -141,6 +141,13 @@ BROWSER=google-chrome-stable subtube play -b
 ```
 or let script try few popular options in random order
 
+OR
+```
+subtube play --handler "google-chrome-stable --incognito"
+subtube play -h "firefox --headless"
+```
+to play with custom handler. Each handler call wont block execution (ran in background).
+
 ### add
 adds new subscribed channel.
 This is link of channel's videos page (we parse that page so it needs to be videos tab)
