@@ -140,7 +140,8 @@ update(){
 }
 
 # 1st argument: thumbnails folder
-# 2st argument: play with browser
+# 2st argument: play with browser|handler
+# 3st argument: handler
 play(){
     # this parts serves as override of THUMBNAILS folder
     thumbnails="$THUMBNAILS"
@@ -198,6 +199,8 @@ play(){
             else
                 $BROWSER "$url"
             fi
+        elif [ $2 == "handler" ]; then
+            $3 "$url" &
         else
             # try to play it until it works (maximum 3 times)
             # mpv has youtube-dl hook and sometimes it work on second try
@@ -292,7 +295,12 @@ elif [[ $1 == 'play' ]]; then
     if [[ $2 == "-b" ]] || [[ $2 == "--browser" ]]; then
         arg="browser"
     fi
-    play "" $arg
+    if [[ $2 == "-h" ]] || [[ $2 == "--handler" ]]; then
+        [ $# -lt 3 ] && die "you need to specify handler"
+        play "" "handler" $3
+    else
+        play "" $arg
+    fi
 elif [[ $1 == 'clean' ]]; then
     [ $# -lt 2 ] && die "Pass number that specifies how many days" \
         "old videos to keep (delete older)"
