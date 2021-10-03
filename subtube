@@ -330,6 +330,8 @@ else
     echo "  play                       sxiv picking dialog for playing all marked videos"
     echo '    --browser                play with your browser instead (guess or use $BROWSER)'
     echo "    -b                       alias --browser"
+    echo '    --handler [handler]      play with custom handler (wrap in quotes)'
+    echo "    -h [handler]             alias --handler"
     echo "  init                       dont download thumbnails - for first time"
     echo "  name path_to_file          notify-send video title"
     echo "  name_length path_to_file   notify-send video title (with length)"
