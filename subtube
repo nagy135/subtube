@@ -202,8 +202,8 @@ play(){
             $3 "$url" &
         else
             # try to play it until it works (maximum 3 times)
-            # mpv has youtube-dl hook and sometimes it work on second try
-            # if 3 times is not enough, you probably just need to update your 
+            # mpv has youtube-dl hook and sometimes it works on second try.
+            # if 3 times is not enough, you probably just need to update your
             # local youtube-dl (python -m pip install --upgrade youtube-dl)
             n=0
             until [ "$n" -ge 3 ]
@@ -261,7 +261,7 @@ time_selection(){
 }
 
 get_thumbnail(){
-    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" -O "$THUMBNAILS/$1.jpg"
+    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" &> /dev/null -O "$THUMBNAILS/$1.jpg"
 }
 
 progress_bar(){
