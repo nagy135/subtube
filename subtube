@@ -8,10 +8,6 @@ SEEN="$PREFIX/seen.lst"
 # storage of data regarding subscribed channels
 SUBSCRIBES="$PREFIX/subscribes"
 
-# icons
-PLAYING_ICON="$PREFIX/subtube-playing.png"
-YOUTUBE_ICON="$PREFIX/subtube_youtube.png"
-
 # location of thumbnails
 THUMBNAILS="$PREFIX/thumbnails"
 
@@ -35,12 +31,12 @@ img_view="$(check_dep nsxiv)"
 [ "$img_view" = ":" ] && img_view="sxiv"
 
 die(){
-    [ -n "$1" ] && printf "$*\n" >&2
+    [ -n "$1" ] && printf "%s\n" "$*" >&2
     exit 1
 }
 
 add_subscriber(){
-    echo $1 >> "$SUBSCRIBES"
+    echo "$1" >> "$SUBSCRIBES"
 }
 
 metadata(){
@@ -48,18 +44,18 @@ metadata(){
     url="https://www.youtube.com/watch?v=$id"
     TITLE=$(youtube-dl -e "$url")
 
-    [[ $1 == "name" ]] && $noti -i $2 "$TITLE" && exit 0
-    duration=$(youtube-dl --get-duration $url)
-    $noti -i $2 "$TITLE" "$duration"
+    [[ $1 == "name" ]] && $noti -i "$2" "$TITLE" && exit 0
+    duration=$(youtube-dl --get-duration "$url")
+    $noti -i "$2" "$TITLE" "$duration"
 }
 
 update(){
     # internet verification
-    wget -q --spider http://google.com
-    if [[ $? -gt 0 ]]; then
+    if ! wget -q --spider http://google.com; then
         $noti -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
         exit 1
     fi
+
     # avoid running twice at the same time
     if [[ -f $PIDFILE ]]; then
         $noti -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
@@ -79,14 +75,14 @@ update(){
     subcount=$(wc -l < "$SUBSCRIBES")
 
     # loop over subscribed urls
-    while read line; do
+    while read -r line; do
         sub_i=$((sub_i+1))
 
         # notify progress
-        [[ $1 != "secret" ]] && progress_bar $sub_i $subcount 30
+        [[ $1 != "secret" ]] && progress_bar $sub_i "$subcount" 30
 
         # get first 10 video hashes parsed from youtube video page
-        vid_ids=$(curl -s $line \
+        vid_ids=$(curl -s "$line" \
             | grep ytInitialData \
             | head -n 1 \
             | sed 's/;$// ; s/window\["ytInitialData"\]\s*=\s*// ; s/.*var ytInitialData = //' \
@@ -106,22 +102,22 @@ update(){
             | head)
 
         # loop over hashes
-        while read vid_id; do
+        while read -r vid_id; do
 
             # filter out already seen ones
-            [ -n "$(grep -e "^$vid_id$" $SEEN)" ] && continue
+            if grep -qe "$vid_id" "$SEEN"; then continue; fi
 
             # if problem occured during parsing 
             [[ -z "$vid_id" ]] && echo "error parsing given url: $line" && continue
 
-            [[ $1 != "init" ]] && get_thumbnail $vid_id
-            echo $vid_id >> $SEEN
+            [[ $1 != "init" ]] && get_thumbnail "$vid_id"
+            echo "$vid_id" >> $SEEN
             [[ $1 == "init" ]] && continue
 
             # get video metadata
             url="https://www.youtube.com/watch?v=$vid_id"
-            title=$(youtube-dl -e $url)
-            duration=$(youtube-dl --get-duration $url)
+            title=$(youtube-dl -e "$url")
+            duration=$(youtube-dl --get-duration "$url")
 
             $noti -i 'none' -t 3000 "$title" "$duration" -u critical -i "$THUMBNAILS/$vid_id.jpg"
         done <<< "$vid_ids"
@@ -158,21 +154,21 @@ play(){
 
     count=$(echo "$chosen" | wc -l)
     i=1
-    while read choice; do
+    while read -r choice; do
         # first move it so that its 'removed' instantly
-        file_name=$(basename $choice)
-        mv $choice "/tmp/$file_name"
+        file_name=$(basename "$choice")
+        mv "$choice" "/tmp/$file_name"
         choice="/tmp/$file_name"
 
         # get video hash
         id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
         if [[ $count -eq 1 ]]; then
-            notify_name "Playing" $id $choice
+            notify_name "Playing" "$id" "$choice"
         else
-            notify_name "Playing $i/$count" $id $choice
+            notify_name "Playing $i/$count" "$id" "$choice"
             i=$((i+1))
         fi
-        rm $choice
+        rm "$choice"
 
         url="https://www.youtube.com/watch?v=$id"
         TITLE=$(youtube-dl -e "$url")
@@ -180,7 +176,7 @@ play(){
         # integration with mpv_history, script of mine storing every seen video
         [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
 
-        if [ $2 == "browser" ]; then
+        if [ "$2" == "browser" ]; then
             if [ -z "${BROWSER+x}" ]; then
                 for browser in \
                     chromium \
@@ -199,7 +195,7 @@ play(){
             else
                 $BROWSER "$url"
             fi
-        elif [ $2 == "handler" ]; then
+        elif [ "$2" == "handler" ]; then
             $3 "$url" &
         else
             # try to play it until it works (maximum 3 times)
@@ -231,7 +227,7 @@ time_selection(){
 
     # make sure folder exists
     tmp_thumbnails="/tmp/tmp_thumbnails_$sel_type"
-    mkdir -p $tmp_thumbnails
+    mkdir -p "$tmp_thumbnails"
 
     # set find flags
     flag="-mtime"
@@ -242,23 +238,23 @@ time_selection(){
 
     # move all older than N days into the directory
     find "$THUMBNAILS" \
-        $flag $argument \
+        $flag "$argument" \
         -type f \
-        -exec mv -t $tmp_thumbnails {} +
+        -exec mv -t "$tmp_thumbnails" {} +
 
     # perform sxiv selection
     if [[ $sel_type == "newest" ]]; then
-        play $tmp_thumbnails
+        play "$tmp_thumbnails"
     else
-        chosen=$("$img_view" -tbop $tmp_thumbnails || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
-        [ -n "$chosen" ] && rm $chosen
+        chosen=$("$img_view" -tbop "$tmp_thumbnails" || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
+        [ -n "$chosen" ] && rm "$chosen"
     fi
 
     # move rest back
-    mv $tmp_thumbnails/* "$THUMBNAILS" 2> /dev/null
+    mv "$tmp_thumbnails"/* "$THUMBNAILS" 2> /dev/null
 
     # remove empty folder
-    rmdir $tmp_thumbnails
+    rmdir "$tmp_thumbnails"
 }
 
 get_thumbnail(){
@@ -271,14 +267,14 @@ progress_bar(){
         mkfifo $fifo
         chmod 766 $fifo
         subcount=$(wc -l < "$SUBSCRIBES")
-        tail -f $fifo | wob -t 5000 -a bottom -m $subcount &> /dev/null &
+        tail -f $fifo | wob -t 5000 -a bottom -m "$subcount" &> /dev/null &
         progressbar_pid=$!
     elif [[ $1 == '-k' ]]; then
         rm $fifo
         kill $progressbar_pid
         pkill -f "tail -f $fifo"
     else
-        echo $1 > $fifo
+        echo "$1" > $fifo
     fi
 }
 
@@ -297,27 +293,27 @@ elif [[ $1 == 'play' ]]; then
     fi
     if [[ $2 == "-h" ]] || [[ $2 == "--handler" ]]; then
         [ $# -lt 3 ] && die "you need to specify handler"
-        play "" "handler" $3
+        play "" "handler" "$3"
     else
         play "" $arg
     fi
 elif [[ $1 == 'clean' ]]; then
     [ $# -lt 2 ] && die "Pass number that specifies how many days" \
         "old videos to keep (delete older)"
-    time_selection clean $2
+    time_selection clean "$2"
 elif [[ $1 == 'newest' ]]; then
     [ $# -lt 2 ] && die "Pass number that specifies how many minutes" \
         "old videos to show (for playing)"
-    time_selection newest $2
+    time_selection newest "$2"
 elif [[ $1 == 'add' ]]; then
     [ $# -lt 2 ] && die "Pass url to videos page!"
-    add_subscriber $2
+    add_subscriber "$2"
 elif [[ $1 == 'name' ]]; then
     [ $# -lt 2 ] && die "Pass path to file with video id!"
-    metadata name $2
+    metadata name "$2"
 elif [[ $1 == 'name_length' ]]; then
     [ $# -lt 2 ] && die "Pass path to file with video id!"
-    metadata name_length $2
+    metadata name_length "$2"
 else
     echo "Usage: subtube [OPTION]"
     echo "Youtube interface without browser"
@@ -328,7 +324,7 @@ else
     echo "    --secret                 update database without notifications (for crontab)"
     echo "    -s                       alias --secret"
     echo "  play                       sxiv picking dialog for playing all marked videos"
-    echo '    --browser                play with your browser instead (guess or use $BROWSER)'
+    echo "    --browser                play with your browser instead (guess or use \$BROWSER)"
     echo "    -b                       alias --browser"
     echo '    --handler [handler]      play with custom handler (wrap in quotes)'
     echo "    -h [handler]             alias --handler"
@@ -337,5 +333,5 @@ else
     echo "  name_length path_to_file   notify-send video title (with length)"
     echo "  clean N                    select videos older than N days to delete"
     echo "  newest N                   select videos more recent than N minutes to choose from"
-    echo '  add $url                   add subscriber (video page url of youtube channel)'
+    echo "  add [url]                   add subscriber (video page url of youtube channel)"
 fi
