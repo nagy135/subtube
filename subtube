@@ -323,7 +323,7 @@ else
     echo "  update                     update database"
     echo "    --secret                 update database without notifications (for crontab)"
     echo "    -s                       alias --secret"
-    echo "  play                       sxiv picking dialog for playing all marked videos"
+    echo "  play                       (n)sxiv picking dialog for playing all marked videos"
     echo "    --browser                play with your browser instead (guess or use \$BROWSER)"
     echo "    -b                       alias --browser"
     echo '    --handler [handler]      play with custom handler (wrap in quotes)'
@@ -333,5 +333,5 @@ else
     echo "  name_length path_to_file   notify-send video title (with length)"
     echo "  clean N                    select videos older than N days to delete"
     echo "  newest N                   select videos more recent than N minutes to choose from"
-    echo "  add [url]                   add subscriber (video page url of youtube channel)"
+    echo "  add [url]                  add subscriber (video page url of youtube channel)"
 fi
