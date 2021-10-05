@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 PREFIX=/usr/share/subtube/resources
 
@@ -45,7 +45,7 @@ metadata(){
     url="https://www.youtube.com/watch?v=$id"
     TITLE=$(youtube-dl -e "$url")
 
-    [[ $1 == "name" ]] && $noti -i "$2" "$TITLE" && exit 0
+    [ "$1" = "name" ] && $noti -i "$2" "$TITLE" && exit 0
     duration=$(youtube-dl --get-duration "$url")
     $noti -i "$2" "$TITLE" "$duration"
 }
@@ -58,7 +58,7 @@ update(){
     fi
 
     # avoid running twice at the same time
-    if [[ -f $PIDFILE ]]; then
+    if [ -f $PIDFILE ]; then
         $noti -i 'none' -u critical -t 2000 "Subtube" "Update already in progress, wait..."
         exit 0
     else
@@ -66,10 +66,10 @@ update(){
     fi
 
     # cleanup if terminated by user
-    trap "rm $PIDFILE" SIGINT SIGTERM
+    trap "rm $PIDFILE" INT TERM
 
     # initialize progress bar (xob)
-    [[ $1 != "secret" ]] && progress_bar -d
+    [ $1 != "secret" ] && progress_bar -d
 
     # init loop variables
     sub_i=0
@@ -80,7 +80,7 @@ update(){
         sub_i=$((sub_i+1))
 
         # notify progress
-        [[ $1 != "secret" ]] && progress_bar $sub_i "$subcount" 30
+        [ $1 != "secret" ] && progress_bar $sub_i "$subcount" 30
 
         # get first 10 video hashes parsed from youtube video page
         vid_ids=$(curl -s "$line" \
@@ -103,17 +103,17 @@ update(){
             | head)
 
         # loop over hashes
-        while read -r vid_id; do
+        echo "$vid_ids" | while read -r vid_id; do
 
             # filter out already seen ones
             if grep -qe "$vid_id" "$SEEN"; then continue; fi
 
             # if problem occured during parsing 
-            [[ -z "$vid_id" ]] && echo "error parsing given url: $line" && continue
+            [ -z "$vid_id" ] && echo "error parsing given url: $line" && continue
 
-            [[ $1 != "init" ]] && get_thumbnail "$vid_id"
+            [ "$1" != "init" ] && get_thumbnail "$vid_id"
             echo "$vid_id" >> $SEEN
-            [[ $1 == "init" ]] && continue
+            [ "$1" = "init" ] && continue
 
             # get video metadata
             url="https://www.youtube.com/watch?v=$vid_id"
@@ -121,13 +121,13 @@ update(){
             duration=$(youtube-dl --get-duration "$url")
 
             $noti -i 'none' -t 3000 "$title" "$duration" -u critical -i "$THUMBNAILS/$vid_id.jpg"
-        done <<< "$vid_ids"
+        done
 
 
     done < "$SUBSCRIBES"
 
     # kill progress bar
-    if [[ $1 != "secret" ]]; then
+    if [ $1 != "secret" ]; then
         $noti -i 'none' -t 3000 "Subtube" "$(find "$THUMBNAILS" -type f | wc -l) unseen video(s)"
         progress_bar -k
     fi
@@ -145,19 +145,19 @@ play(){
     [ -n "$1" ] && thumbnails="$1"
 
     # bspwm users get floating sxiv centered in middle of the screen
-    [[ $($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//') == 'bspwm' ]] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
+    [ "$($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//')" = "bspwm" ] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
     chosen=$("$img_view" -tbop "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
-    if [[ -z $chosen ]]; then
-        [[ -z $1 ]] \
+    if [ -z $chosen ]; then
+        [ -z $1 ] \
             && exit \
             || return
     fi
 
     count=$(echo "$chosen" | wc -l)
     i=1
-    while read -r choice; do
+    echo "$chosen" | while read -r choice; do
         # first move it so that its 'removed' instantly
         file_name=$(basename "$choice")
         mv "$choice" "/tmp/$file_name"
@@ -165,7 +165,7 @@ play(){
 
         # get video hash
         id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
-        if [[ $count -eq 1 ]]; then
+        if [ $count -eq 1 ]; then
             notify_name "Playing" "$id" "$choice"
         else
             notify_name "Playing $i/$count" "$id" "$choice"
@@ -177,9 +177,9 @@ play(){
         TITLE=$(youtube-dl -e "$url")
 
         # integration with mpv_history, script of mine storing every seen video
-        [[ -f ~/.local/share/qutebrowser/mpv_history ]] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
+        [ -f "$HOME/.local/share/qutebrowser/mpv_history" ] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
 
-        if [ "$2" == "browser" ]; then
+        if [ "$2" = "browser" ]; then
             if [ -z "${BROWSER+x}" ]; then
                 for browser in \
                     chromium \
@@ -198,7 +198,7 @@ play(){
             else
                 $BROWSER "$url"
             fi
-        elif [ "$2" == "handler" ]; then
+        elif [ "$2" = "handler" ]; then
             $3 "$url" &
         else
             # try to play it until it works (maximum 3 times)
@@ -208,13 +208,13 @@ play(){
             n=0
             until [ "$n" -ge 3 ]
             do
-                [[ "$n" -ge 1 ]] && $noti -t 1000 "MPV" "retry $n"
-                mpv "$url" &> /dev/null && break
+                [ "$n" -ge 1 ] && $noti -t 1000 "MPV" "retry $n"
+                mpv "$url" >/dev/null 2>&1 && break
                 n=$((n+1)) 
                 sleep 2
             done
         fi
-    done <<< "$chosen"
+    done
 }
 
 notify_name(){
@@ -235,7 +235,7 @@ time_selection(){
     # set find flags
     flag="-mtime"
     argument=+$1
-    [[ $sel_type == "newest" ]] \
+    [ "$sel_type" = "newest" ] \
         && flag="-mmin" \
         && argument="-$1"
 
@@ -246,7 +246,7 @@ time_selection(){
         -exec mv -t "$tmp_thumbnails" {} +
 
     # perform (n)sxiv selection
-    if [[ $sel_type == "newest" ]]; then
+    if [ "$sel_type" = "newest" ]; then
         play "$tmp_thumbnails"
     else
         chosen=$("$img_view" -tbop "$tmp_thumbnails" || $noti -i 'none' -t 2000 "Subtube" "No video deleted")
@@ -261,18 +261,18 @@ time_selection(){
 }
 
 get_thumbnail(){
-    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" &> /dev/null -O "$THUMBNAILS/$1.jpg"
+    wget -cq "https://i3.ytimg.com/vi/$1/hqdefault.jpg" >/dev/null 2>&1 -O "$THUMBNAILS/$1.jpg"
 }
 
 progress_bar(){
     command -v xob >/dev/null || return
-    if [[ $1 == '-d' ]]; then
+    if [ "$1" = '-d' ]; then
         mkfifo $fifo
         chmod 766 $fifo
         subcount=$(wc -l < "$SUBSCRIBES")
-        tail -f $fifo | xob -t 5000 -s subtube -m "$subcount" &> /dev/null &
+        tail -f $fifo | xob -t 5000 -s subtube -m "$subcount" >/dev/null 2>&1 &
         progressbar_pid=$!
-    elif [[ $1 == '-k' ]]; then
+    elif [ "$1" = '-k' ]; then
         rm $fifo
         kill $progressbar_pid
         pkill -f "tail -f $fifo"
@@ -281,40 +281,40 @@ progress_bar(){
     fi
 }
 
-if [[ $1 == 'update' ]]; then
+if [ "$1" = 'update' ]; then
     arg=""
-    if [[ $2 == "-s" ]] || [[ $2 == "--secret" ]]; then
+    if [ "$2" = "-s" ] || [ "$2" = "--secret" ]; then
         arg="secret"
     fi
     update $arg
-elif [[ $1 == 'init' ]]; then
+elif [ "$1" = 'init' ]; then
     update init
-elif [[ $1 == 'play' ]]; then
+elif [ "$1" = 'play' ]; then
     arg=""
-    if [[ $2 == "-b" ]] || [[ $2 == "--browser" ]]; then
+    if [ "$2" = "-b" ] || [ "$2" = "--browser" ]; then
         arg="browser"
     fi
-    if [[ $2 == "-h" ]] || [[ $2 == "--handler" ]]; then
+    if [ "$2" = "-h" ] || [ "$2" = "--handler" ]; then
         [ $# -lt 3 ] && die "you need to specify handler"
         play "" "handler" "$3"
     else
         play "" $arg
     fi
-elif [[ $1 == 'clean' ]]; then
+elif [ "$1" = 'clean' ]; then
     [ $# -lt 2 ] && die "Pass number that specifies how many days" \
         "old videos to keep (delete older)"
     time_selection clean "$2"
-elif [[ $1 == 'newest' ]]; then
+elif [ "$1" = 'newest' ]; then
     [ $# -lt 2 ] && die "Pass number that specifies how many minutes" \
         "old videos to show (for playing)"
     time_selection newest "$2"
-elif [[ $1 == 'add' ]]; then
+elif [ "$1" = 'add' ]; then
     [ $# -lt 2 ] && die "Pass url to videos page!"
     add_subscriber "$2"
-elif [[ $1 == 'name' ]]; then
+elif [ "$1" = 'name' ]; then
     [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name "$2"
-elif [[ $1 == 'name_length' ]]; then
+elif [ "$1" = 'name_length' ]; then
     [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name_length "$2"
 else
