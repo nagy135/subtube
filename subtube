@@ -69,7 +69,7 @@ update(){
     trap "rm $PIDFILE" INT TERM
 
     # initialize progress bar (xob)
-    [ $1 != "secret" ] && progress_bar -d
+    [ "$1" != "secret" ] && progress_bar -d
 
     # init loop variables
     sub_i=0
@@ -80,7 +80,7 @@ update(){
         sub_i=$((sub_i+1))
 
         # notify progress
-        [ $1 != "secret" ] && progress_bar $sub_i "$subcount" 30
+        [ "$1" != "secret" ] && progress_bar $sub_i "$subcount" 30
 
         # get first 10 video hashes parsed from youtube video page
         vid_ids=$(curl -s "$line" \
@@ -127,7 +127,7 @@ update(){
     done < "$SUBSCRIBES"
 
     # kill progress bar
-    if [ $1 != "secret" ]; then
+    if [ "$1" != "secret" ]; then
         $noti -i 'none' -t 3000 "Subtube" "$(find "$THUMBNAILS" -type f | wc -l) unseen video(s)"
         progress_bar -k
     fi
@@ -149,8 +149,8 @@ play(){
 
     chosen=$("$img_view" -tbop "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
-    if [ -z $chosen ]; then
-        [ -z $1 ] \
+    if [ -z "$chosen" ]; then
+        [ -z "$1" ] \
             && exit \
             || return
     fi
@@ -165,7 +165,7 @@ play(){
 
         # get video hash
         id=$(echo "$choice" | sed "s/.*\/// ; s/\.jpg//")
-        if [ $count -eq 1 ]; then
+        if [ "$count" -eq 1 ]; then
             notify_name "Playing" "$id" "$choice"
         else
             notify_name "Playing $i/$count" "$id" "$choice"
