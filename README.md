@@ -33,6 +33,9 @@ First 4 are core, last 2 are optional.
 Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
 **WOB** is progress bar, it shows u progress of update process. You can completely avoid having it and use `subtube update--secret` that doesnt spawn any progress bar anyway. Using `subtube play` would result in some error messages.
 
+Script was rewritten to avoid bash dependency.
+Use any POSIX compliant shell to run (like *dash* but *bash* will also suffice).
+
 ## ARCH
 on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-wayland-git/) in [install section](#install).
 ```
