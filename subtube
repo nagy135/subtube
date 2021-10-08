@@ -263,11 +263,11 @@ get_thumbnail(){
 
 progress_bar(){
     command -v wob >/dev/null || return
-    if [ "$1" = '-d']; then
+    if [ "$1" = '-d' ]; then
         mkfifo $fifo
         chmod 766 $fifo
         subcount=$(wc -l < "$SUBSCRIBES")
-        tail -f $fifo | wob -t 5000 -a bottom -m "$subcount" &> /dev/null &
+        tail -f $fifo | wob -t 5000 -a bottom -m "$subcount" > /dev/null 2>&1 &
         progressbar_pid=$!
     elif [ "$1" = '-k' ]; then
         rm $fifo
