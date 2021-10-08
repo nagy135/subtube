@@ -35,6 +35,9 @@ Without this dependency you wouldnt see any notifications, but it would still wo
 **XOB** is progress bar, if it's not installed then progress bar will be automatically disabled. Using `subtube update --secret` also disables the progress bar.
 **Wmctrl** is only used to determine WM to center sxiv on bspwm.
 
+Script was rewritten to avoid bash dependency.
+Use any POSIX compliant shell to run (like *dash* but *bash* will also suffice).
+
 ## ARCH
 on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-git/) in [install section](#install).
 ```
