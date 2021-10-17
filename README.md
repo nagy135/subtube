@@ -28,6 +28,18 @@ This project has 4 dependencies and 2 optional ones. If you use arch or almost a
 * [mako](https://github.com/emersion/mako)
 * [wob](https://github.com/francma/wob)
 
+## Optional change
+Recently, `youtube-dl` appears to be pretty slow.
+As I have no idea why this would be the case, I leave this as default still.
+If your buffering is slow, you should try `youtube-dl` alternative: [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation).
+You need to tell mpv to use it via mpv's configuration file (`$XDG_CONFIG_HOME/mpv/mpv.conf`).
+Add this line to said file to switch (for me this one is WAY FASTER).
+```
+script-opts=ytdl_hook-ytdl_path=yt-dlp
+```
+
+First 4 are core, last 3 are optional.
+**Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
 First 4 are core, last 2 are optional.
 **Mako** is simply notification daemon that is heavily used. If you dont install mako, you still get some notification (because you probably have different one).
 Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
