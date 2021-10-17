@@ -7,9 +7,9 @@ install:
 	cp subtube $(DESTDIR)$(PREFIX)/bin/subtube
 	chmod +x $(DESTDIR)$(PREFIX)/bin/subtube
 	mkdir -p $(DESTDIR)$(PREFIX)/share/subtube
-	if [ ! -d "$(DESTDIR)$(PREFIX)/share/subtube/resources" ]; then \
-		cp -n -R resources "$(DESTDIR)$(PREFIX)/share/subtube"; \
-	fi
+	touch $(DESTDIR)$(PREFIX)/share/subtube/resources/seen.lst
+	touch $(DESTDIR)$(PREFIX)/share/subtube/resources/subscribes
+	mkdir -p $(DESTDIR)$(PREFIX)/share/subtube/resources/thumbnails
 	chmod 777 -R $(DESTDIR)$(PREFIX)/share/subtube
 
 reinstall:
