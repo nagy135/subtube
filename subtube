@@ -5,8 +5,11 @@ PREFIX=/usr/share/subtube/resources
 # list of seen video hashes
 SEEN="$PREFIX/seen.lst"
 
-# storage of data regarding subscribed channels
+# storage of subscribed urls
 SUBSCRIBES="$PREFIX/subscribes"
+
+# storage of video titles
+VIDEO_METADATA="$PREFIX/video_metadata"
 
 # location of thumbnails
 THUMBNAILS="$PREFIX/thumbnails"
@@ -14,12 +17,16 @@ THUMBNAILS="$PREFIX/thumbnails"
 # pidfile (update in progress)
 PIDFILE=/tmp/subtube_update.pid
 
+# separates metadata blocks
+SEPARATOR="||"
+
 # variables for XOB (progress bar)
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
 ensure_local_storage(){
     [ -f "$SUBSCRIBES" ] || touch "$SUBSCRIBES"
+    [ -f "$VIDEO_METADATA" ] || touch "$VIDEO_METADATA"
     [ -f "$SEEN" ] || touch "$SEEN"
     [ -d "$THUMBNAILS" ] || mkdir "$THUMBNAILS"
 }
@@ -47,12 +54,11 @@ add_subscriber(){
 
 metadata(){
     id=$(echo "$2" | sed "s/.*\/// ; s/\.jpg//")
-    url="https://www.youtube.com/watch?v=$id"
-    TITLE=$(youtube-dl -e "$url")
+    title="$(get_title $id)"
 
-    [ "$1" = "name" ] && $noti -i "$2" "$TITLE" && exit 0
-    duration=$(youtube-dl --get-duration "$url")
-    $noti -i "$2" "$TITLE" "$duration"
+    [ "$1" = "name" ] && $noti -i "$2" "$title" && exit 0
+    duration="$(get_duration $id)"
+    $noti -i "$2" "$title" "$duration"
 }
 
 update(){
@@ -122,8 +128,10 @@ update(){
 
             # get video metadata
             url="https://www.youtube.com/watch?v=$vid_id"
-            title=$(youtube-dl -e "$url")
-            duration=$(youtube-dl --get-duration "$url")
+            title="$(get_title $vid_id)"
+            duration="$(get_duration $vid_id)"
+
+            echo "$vid_id $SEPARATOR $duration $SEPARATOR $title" >> "$VIDEO_METADATA"
 
             $noti -i 'none' -t 3000 "$title" "$duration" -u critical -i "$THUMBNAILS/$vid_id.jpg"
         done
@@ -176,11 +184,10 @@ play(){
         fi
         rm "$choice"
 
-        url="https://www.youtube.com/watch?v=$id"
-        TITLE=$(youtube-dl -e "$url")
+        title=$(get_title $id)
 
         # integration with mpv_history, script of mine storing every seen video
-        [ -f "$HOME/.local/share/qutebrowser/mpv_history" ] && echo "$TITLE($url)" >> ~/.local/share/qutebrowser/mpv_history
+        [ -f "$HOME/.local/share/qutebrowser/mpv_history" ] && echo "$title($url)" >> ~/.local/share/qutebrowser/mpv_history
 
         if [ "$2" = "browser" ]; then
             if [ -z "${BROWSER+x}" ]; then
@@ -221,9 +228,17 @@ play(){
 }
 
 notify_name(){
-    title=$(youtube-dl -e "https://www.youtube.com/watch?v=$2")
+    title="$(get_title $2)"
     $noti -i "$3" -t 4000 "$1" "$title"
 
+}
+
+get_title(){
+    youtube-dl -e "https://www.youtube.com/watch?v=$1"
+}
+
+get_duration(){
+    youtube-dl --get-duration "https://www.youtube.com/watch?v=$1"
 }
 
 # 1st argument switch [clean|newest]
@@ -342,6 +357,4 @@ else
     echo "  clean N                    select videos older than N days to delete"
     echo "  newest N                   select videos more recent than N minutes to choose from"
     echo "  add [url]                  add subscriber (video page url of youtube channel)"
-fi
-er (video page url of youtube channel)"
 fi
