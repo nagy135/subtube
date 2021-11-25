@@ -18,6 +18,13 @@ PIDFILE=/tmp/subtube_update.pid
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
+ensure_local_storage(){
+    [ -d "$PREFIX" ] || mkdir -p "$PREFIX"
+    [ -f "$SUBSCRIBES" ] || touch "$SUBSCRIBES"
+    [ -f "$SEEN" ] || touch "$SEEN"
+    [ -d "$THUMBNAILS" ] || mkdir "$SUBSCRIBES"
+}
+
 check_dep(){
     if command -v "$1" >/dev/null; then
         echo "$1"
@@ -277,6 +284,8 @@ progress_bar(){
         echo "$1" > $fifo
     fi
 }
+
+ensure_local_storage()
 
 if [ "$1" = 'update' ]; then
     arg=""
