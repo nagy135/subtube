@@ -52,15 +52,6 @@ add_subscriber(){
     echo "$1" >> "$SUBSCRIBES"
 }
 
-metadata(){
-    id=$(echo "$2" | sed "s/.*\/// ; s/\.jpg//")
-    title="$(get_title $id)"
-
-    [ "$1" = "name" ] && $noti -i "$2" "$title" && exit 0
-    duration="$(get_duration $id)"
-    $noti -i "$2" "$title" "$duration"
-}
-
 update(){
     # internet verification
     if ! wget -q --spider http://google.com; then
@@ -233,12 +224,43 @@ notify_name(){
 
 }
 
+metadata(){
+    id=$(echo "$2" | sed "s/.*\/// ; s/\.jpg//")
+    title="$(get_title $id)"
+
+    [ "$1" = "name" ] && $noti -i "$2" "$title" && exit 0
+    duration="$(get_duration $id)"
+    $noti -i "$2" "$title" "$duration"
+}
+
 get_title(){
-    youtube-dl -e "https://www.youtube.com/watch?v=$1"
+    cache=$(check_cache_metadata "$1" title)
+    [ "$cache" != "" ] \
+        && echo "$cache" \
+        || youtube-dl -e "https://www.youtube.com/watch?v=$1"
 }
 
 get_duration(){
-    youtube-dl --get-duration "https://www.youtube.com/watch?v=$1"
+    cache=$(check_cache_metadata "$1" duration)
+    [ "$cache" != "" ] \
+        && echo "$cache" \
+        || youtube-dl --get-duration "https://www.youtube.com/watch?v=$1"
+}
+
+check_cache_metadata(){
+    lines=$(cat "$VIDEO_METADATA" | grep "$1" | head -n 1)
+    line_count=$(echo "$lines" | wc -l)
+    [ ! $line_count -eq 1 ] && echo "" && return
+
+    # parse id || time_length || title
+    components=$(echo "$lines" \
+        | sed 's/^.\{11\}\s||\s\([0-9:]*\)\s||\s\(.*\)/\1\n\2/')
+
+    [ $2 = "title" ] \
+        && echo "$components" | sed -n 2p
+
+    [ $2 = "duration" ] \
+        && echo "$components" | sed -n 1p
 }
 
 # 1st argument switch [clean|newest]
