@@ -177,6 +177,8 @@ play(){
 
         title=$(get_title $id)
 
+        url="https://www.youtube.com/watch?v=$id"
+
         # integration with mpv_history, script of mine storing every seen video
         [ -f "$HOME/.local/share/qutebrowser/mpv_history" ] && echo "$title($url)" >> ~/.local/share/qutebrowser/mpv_history
 
