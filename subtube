@@ -19,10 +19,9 @@ fifo=/tmp/subtube.fifo
 progressbar_pid=-1
 
 ensure_local_storage(){
-    [ -d "$PREFIX" ] || mkdir -p "$PREFIX"
     [ -f "$SUBSCRIBES" ] || touch "$SUBSCRIBES"
     [ -f "$SEEN" ] || touch "$SEEN"
-    [ -d "$THUMBNAILS" ] || mkdir "$SUBSCRIBES"
+    [ -d "$THUMBNAILS" ] || mkdir "$THUMBNAILS"
 }
 
 check_dep(){
@@ -285,7 +284,7 @@ progress_bar(){
     fi
 }
 
-ensure_local_storage()
+ensure_local_storage
 
 if [ "$1" = 'update' ]; then
     arg=""
@@ -343,4 +342,6 @@ else
     echo "  clean N                    select videos older than N days to delete"
     echo "  newest N                   select videos more recent than N minutes to choose from"
     echo "  add [url]                  add subscriber (video page url of youtube channel)"
+fi
+er (video page url of youtube channel)"
 fi
