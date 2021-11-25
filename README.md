@@ -94,8 +94,7 @@ git clone https://github.com/nagy135/subtube
 cd subtube
 sudo make install
 ```
-These commands will clone repository and install all the files to **/usr/bin**, **/usr/share/subtube**
-If you want to change the code and rebuild it without loosing watched history, use `sudo make reinstall`
+These commands will clone repository and install executable to **/usr/bin**.
 
 ## UNINSTALL
 removes all files created
