@@ -223,6 +223,8 @@ play(){
                 sleep 2
             done
         fi
+        grep -v "^$id" "$VIDEO_METADATA" > /tmp/subtube_metadata \
+            && cat /tmp/subtube_metadata > "$VIDEO_METADATA"
     done
 }
 
