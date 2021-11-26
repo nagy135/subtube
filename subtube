@@ -230,8 +230,8 @@ play(){
 
 notify_name(){
     title="$(get_title $2)"
-    $noti -i "$3" -t 4000 "$1" "$title"
-
+    duration="$(get_duration $2)"
+    $noti -i "$3" -t 4000 "$1" "$title\n$duration"
 }
 
 metadata(){
