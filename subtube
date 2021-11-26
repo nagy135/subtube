@@ -240,7 +240,7 @@ metadata(){
 
     [ "$1" = "name" ] && $noti -i "$2" "$title" && exit 0
     duration="$(get_duration $id)"
-    $noti -i "$2" "$title" "$duration"
+    $noti -t 3000 -i "$2" "$title" "$duration"
 }
 
 get_title(){
