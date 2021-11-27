@@ -20,9 +20,6 @@ PIDFILE=/tmp/subtube_update.pid
 # separates metadata blocks
 SEPARATOR="||"
 
-# separates records in mpv_history script
-HISTORY_SEPARATOR="##@@##@@##"
-
 # variables for XOB (progress bar)
 fifo=/tmp/subtube.fifo
 progressbar_pid=-1
@@ -185,8 +182,10 @@ play(){
         url="https://www.youtube.com/watch?v=$id"
 
         # integration with mpv_history, script of mine storing every seen video
-        # TODO: publish mpv_history, move it out of qutebrowser
-        [ -f "$HOME/.local/share/qutebrowser/mpv_history" ] && echo "$title $HISTORY_SEPARATOR $url" >> ~/.local/share/qutebrowser/mpv_history
+        # https://github.com/nagy135/mpv_history
+        HISTORY_SEPARATOR="##@@##@@##"
+        MPV_HISTORY="$HOME/.local/share/mpv_history/history"
+        [ -f "$MPV_HISTORY" ] && echo "$title $HISTORY_SEPARATOR $url" >> "$MPV_HISTORY"
 
         if [ "$2" = "browser" ]; then
             if [ -z "${BROWSER+x}" ]; then
