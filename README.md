@@ -183,6 +183,10 @@ subtube newest N
 
 note that we use url of videos folder, not channel. This is because we find new videos by parsing page html (link has to point to videos folder!)
 
+# MPV_HISTORY
+Another script of mine [mpv_history](https://github.com/nagy135/mpv_history) can be used to replay video again.
+Simply install it and subtube will populate it with records.
+
 # SXIV integration
 if you add following lines to your sxiv config (~/.config/sxiv/exec/key-handler) you will be able to show video title as notification or remove thumbnails.
 
