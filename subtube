@@ -1,6 +1,7 @@
 #!/bin/sh
 
-PREFIX="${PREFIX:-/usr/share/subtube/resources}"
+PREFIX="${PREFIX:-/usr}"
+PREFIX="${PREFIX}/share/subtube/resources"
 
 # list of seen video hashes
 SEEN="$PREFIX/seen.lst"
