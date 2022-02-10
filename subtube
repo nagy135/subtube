@@ -1,19 +1,20 @@
 #!/bin/sh
 
-PREFIX="${PREFIX:-/usr}"
-PREFIX="${PREFIX}/share/subtube/resources"
+DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+
+DATA_HOME="${DATA_HOME}/subtube"
 
 # list of seen video hashes
-SEEN="$PREFIX/seen.lst"
+SEEN="$DATA_HOME/seen.lst"
 
 # storage of subscribed urls
-SUBSCRIBES="$PREFIX/subscribes"
+SUBSCRIBES="$DATA_HOME/subscribes"
 
 # storage of video titles
-VIDEO_METADATA="$PREFIX/video_metadata"
+VIDEO_METADATA="$DATA_HOME/video_metadata"
 
 # location of thumbnails
-THUMBNAILS="$PREFIX/thumbnails"
+THUMBNAILS="$DATA_HOME/thumbnails"
 
 # pidfile (update in progress)
 PIDFILE=/tmp/subtube_update.pid
