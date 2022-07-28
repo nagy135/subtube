@@ -40,7 +40,6 @@ check_dep(){
 }
 
 noti="$(check_dep notify-send)"
-wmctrl="$(check_dep wmctrl)"
 img_view="$(check_dep nsxiv)"
 [ "$img_view" = ":" ] && img_view="sxiv"
 
@@ -150,7 +149,7 @@ play(){
     [ -n "$1" ] && thumbnails="$1"
 
     # bspwm users get floating sxiv centered in middle of the screen
-    [ "$($wmctrl -m | grep Name | sed 's/^[a-zA-Z]*:\s//')" = "bspwm" ] && bspc rule -a Sxiv --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
+    pidof -s 'bspwm' >/dev/null && bspc rule -a 'Sxiv' --one-shot layer=above sticky=on state=floating rectangle=800x500+560+250
 
     chosen=$("$img_view" -tbop "$thumbnails" || $noti -i 'none' -t 3000 "Subtube" "No videos to play")
 
