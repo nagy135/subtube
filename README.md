@@ -6,6 +6,33 @@
 
 Simple script that lets you watch videos from your subscribed channels without distraction of youtube page.
 
+**Table of Contents**
+
+- [SUBTUBE](#subtube)
+- [Explanation](#explanation)
+- [DEPENDENCIES](#dependencies)
+    - [Optional change](#optional-change)
+    - [ARCH](#arch)
+    - [DEBIAN/UBUNTU](#debianubuntu)
+- [UPDATE](#update)
+- [INSTALL](#install)
+    - [UNINSTALL](#uninstall)
+- [USAGE](#usage)
+    - [COMMANDS](#commands)
+        - [init](#init)
+        - [update](#update)
+        - [play](#play)
+        - [add](#add)
+        - [clean](#clean)
+        - [newest](#newest)
+- [MPV_HISTORY](#mpv_history)
+- [SXIV integration](#sxiv-integration)
+- [CRONTAB](#crontab)
+- [BSPWM](#bspwm)
+- [WAYLAND](#wayland)
+- [FUTURE WORK](#future-work)
+
+
 # Explanation
 Whole idea came from realizing that [sxiv](https://github.com/muennich/sxiv) in it's thumbnail mode allows
 you to select images the same way programs like rofi, dmenu, fzf, etc.
