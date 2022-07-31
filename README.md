@@ -27,13 +27,11 @@ This project has 4 dependencies and 3 optional ones. If you use arch or almost a
 * ===
 * [dunst](https://github.com/dunst-project/dunst)
 * [xob](https://github.com/florentc/xob)
-* [wmctrl](https://github.com/dancor/wmctrl)
 
 First 4 are core, last 3 are optional.
 **Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
 Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
 **XOB** is progress bar, if it's not installed then progress bar will be automatically disabled. Using `subtube update --secret` also disables the progress bar.
-**Wmctrl** is only used to determine WM to center sxiv on bspwm.
 
 Script was rewritten to avoid bash dependency.
 Use any POSIX compliant shell to run (like *dash* but *bash* will also suffice).
