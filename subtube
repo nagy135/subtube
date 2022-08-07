@@ -55,7 +55,7 @@ add_subscriber(){
 
 update(){
     # internet verification
-    if ! wget -q --spider http://google.com; then
+    if ! ping -q -c 1 'example.com' >/dev/null 2>&1; then
         $noti -t 4000 -i 'none' -u critical "Subtube" "No internet connection"
         exit 1
     fi
@@ -177,7 +177,6 @@ play(){
         rm "$choice"
 
         title=$(get_title $id)
-
         url="https://www.youtube.com/watch?v=$id"
 
         # integration with mpv_history, script of mine storing every seen video
@@ -368,23 +367,25 @@ elif [ "$1" = 'name_length' ]; then
     [ $# -lt 2 ] && die "Pass path to file with video id!"
     metadata name_length "$2"
 else
-    echo "Usage: subtube [OPTION]"
-    echo "Youtube interface without browser"
-    echo ""
-    echo "Options:"
-    echo "  -h, --help                 show this message and quit"
-    echo "  update                     update database"
-    echo "    --secret                 update database without notifications (for crontab)"
-    echo "    -s                       alias --secret"
-    echo "  play                       (n)sxiv picking dialog for playing all marked videos"
-    echo "    --browser                play with your browser instead (guess or use \$BROWSER)"
-    echo "    -b                       alias --browser"
-    echo '    --handler [handler]      play with custom handler (wrap in quotes)'
-    echo "    -h [handler]             alias --handler"
-    echo "  init                       dont download thumbnails - for first time"
-    echo "  name path_to_file          notify-send video title"
-    echo "  name_length path_to_file   notify-send video title (with length)"
-    echo "  clean N                    select videos older than N days to delete"
-    echo "  newest N                   select videos more recent than N minutes to choose from"
-    echo "  add [url]                  add subscriber (video page url of youtube channel)"
+    tee <<EOF >&2
+Usage: subtube [OPTION]
+Youtube interface without browser
+
+Options:
+  -h, --help                 show this message and quit
+  update                     update database
+    --secret                 update database without notifications (for crontab)
+    -s                       alias --secret
+  play                       (n)sxiv picking dialog for playing all marked videos
+    --browser                play with your browser instead (guess or use \$BROWSER)
+    -b                       alias --browser
+    --handler [handler]      play with custom handler (wrap in quotes)'
+    -h        [handler]      alias --handler
+  init                       dont download thumbnails - for first time
+  name path_to_file          notify-send video title
+  name_length path_to_file   notify-send video title (with length)
+  clean N                    select videos older than N days to delete
+  newest N                   select videos more recent than N minutes to choose from
+  add [url]                  add subscriber (video page url of youtube channel)
+EOF
 fi
