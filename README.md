@@ -45,19 +45,20 @@ I rewrote this script with a lot of comments so feel free to fork and modify it 
 
 # DEPENDENCIES
 
-This project has 4 dependencies and 3 optional ones. If you use arch or almost any normal linux distribution, this should be easy to get for you.
+This project has very few dependencies. If you use arch or almost any normal linux distribution, this should be easy to get for you.
 
-* [sxiv](https://github.com/muennich/sxiv) or [nsxiv](https://github.com/nsxiv/nsxiv)
-* [youtube-dl](https://github.com/ytdl-org/youtube-dl)
-* [mpv](https://github.com/mpv-player/mpv)
-* [jq](https://github.com/stedolan/jq)
-* ===
-* [dunst](https://github.com/dunst-project/dunst)
-* [xob](https://github.com/florentc/xob)
+* Mandatory dependencies:
+  * [sxiv](https://github.com/xyb3rt/sxiv) or [nsxiv](https://github.com/nsxiv/nsxiv)
+  * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
+  * [mpv](https://github.com/mpv-player/mpv)
+  * [jq](https://github.com/stedolan/jq)
 
-First 4 are core, last 3 are optional.
+* Optional dependencies:
+  * [dunst](https://github.com/dunst-project/dunst)
+  * [xob](https://github.com/florentc/xob)
+
 **Dunst** is simply notification daemon that is heavily used. If you dont install dunst, you still get some notification (because you probably have different one), but dunst supports images and stacking.
-Without this dependency you wouldnt see any notifications, but it would still work. If you dont know what *notification daemon* means, you probably have it.
+Without this dependency you wouldn't see any notifications, but it would still work. If you don't know what *notification daemon* means, you probably have it.
 **XOB** is progress bar, if it's not installed then progress bar will be automatically disabled. Using `subtube update --secret` also disables the progress bar.
 
 Script was rewritten to avoid bash dependency.
