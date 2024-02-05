@@ -149,7 +149,7 @@ play(){
     thumbnails="$THUMBNAILS"
     [ -n "$1" ] && thumbnails="$1"
 
-    chosen=$("$img_view" "$thumbnails" || show_notification "No videos to play")
+    chosen=$("$img_view" "$thumbnails" '/Users/viktornagy/Clones/subtube/subtube name_length'  || show_notification "No videos to play")
 
     if [ -z "$chosen" ]; then
         [ -z "$1" ] \
