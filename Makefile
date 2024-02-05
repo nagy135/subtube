@@ -1,6 +1,6 @@
 .POSIX:
 
-PREFIX = /usr
+PREFIX = /usr/local
 install:
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp subtube $(DESTDIR)$(PREFIX)/bin/subtube
