@@ -84,25 +84,14 @@ update(){
         # notify progress
         [ "$1" != "secret" ] && progress_bar $sub_i "$subcount" 30
 
-        # get first 10 video hashes parsed from youtube video page
-        vid_ids=$(curl -s "$line" \
-            | grep ytInitialData \
-            | head -n 1 \
-            | sed 's/;$// ; s/window\["ytInitialData"\]\s*=\s*// ; s/.*var ytInitialData = //' \
-            | jq -r ".contents\
-            .twoColumnBrowseResultsRenderer\
-            .tabs[1]\
-            .tabRenderer\
-            .content\
-            .sectionListRenderer\
-            .contents[0]\
-            .itemSectionRenderer\
-            .contents[0]\
-            .gridRenderer\
-            .items\
-            | .[].gridVideoRenderer.videoId" \
-            2> /dev/null \
-            | head)
+		channel_id="$(yt-dlp --playlist-items 0 -O playlist:channel_url "$line" \
+			| awk -F '/' '{print $5}' 2> /dev/null)"
+
+        # get recent video hashes parsed from youtube channel RSS page
+		vid_ids="$(curl -s "https://www.youtube.com/feeds/videos.xml?channel_id=$channel_id" \
+			| grep "<yt:videoId>" \
+			| sed "s/<[^>]*>//g" \
+			| awk '{$1=$1};1' 2> /dev/null)"
 
         # loop over hashes
         echo "$vid_ids" | while read -r vid_id; do
@@ -245,14 +234,14 @@ get_title(){
     cache=$(check_cache_metadata "$1" title)
     [ "$cache" != "" ] \
         && echo "$cache" \
-        || youtube-dl -e "https://www.youtube.com/watch?v=$1"
+        || yt-dlp -e "https://www.youtube.com/watch?v=$1"
 }
 
 get_duration(){
     cache=$(check_cache_metadata "$1" duration)
     [ "$cache" != "" ] \
         && echo "$cache" \
-        || youtube-dl --get-duration "https://www.youtube.com/watch?v=$1"
+        || yt-dlp --get-duration "https://www.youtube.com/watch?v=$1"
 }
 
 check_cache_metadata(){

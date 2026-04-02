@@ -38,7 +38,7 @@ Whole idea came from realizing that [sxiv](https://github.com/muennich/sxiv) in 
 you to select images the same way programs like rofi, dmenu, fzf, etc.
 This makes it usefull as some sort of dialog.
 Images contain *video id* in it's name so all you need is to play it via [mpv](https://github.com/mpv-player/mpv)
-through [youtube-dl](https://github.com/ytdl-org/youtube-dl).
+through [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 Screenshot above has my modified fork of [sxiv](https://github.com/muennich/sxiv) so it looks little different.
 
 I rewrote this script with a lot of comments so feel free to fork and modify it to your liking
@@ -64,28 +64,18 @@ Without this dependency you wouldn't see any notifications, but it would still w
 Script was rewritten to avoid bash dependency.
 Use any POSIX compliant shell to run (like *dash* but *bash* will also suffice).
 
-## Optional change
-Recently, `youtube-dl` appears to be pretty slow.
-As I have no idea why this would be the case, I leave this as default still.
-If your buffering is slow, you should try `youtube-dl` alternative: [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation).
-You need to tell mpv to use it via mpv's configuration file (`$XDG_CONFIG_HOME/mpv/mpv.conf`).
-Add this line to said file to switch (for me this one is WAY FASTER).
-```
-script-opts=ytdl_hook-ytdl_path=yt-dlp
-```
-
 ## ARCH
 on arch based distro, you can skip getting dependencies and install via [AUR](https://aur.archlinux.org/packages/subtube-git/) in [install section](#install).
 ```
-sudo pacman -S sxiv mpv dunst youtube-dl jq
+sudo pacman -S sxiv mpv dunst yt-dlp
 paru xob
 ```
 
 ## DEBIAN/UBUNTU
 
 ```
-pip install --user youtube-dl
-sudo apt install sxiv mpv dunst jq
+pip install --user yt-dlp
+sudo apt install sxiv mpv dunst
 ```
 Xob is not present on debian repo, install from source via link in *dependencies*. You will probably just need to run these commands
 
@@ -98,9 +88,9 @@ sudo make install
 ```
 
 # UPDATE
-if script stops working one day for you, you need to update your youtube-dl
+if script stops working one day for you, you need to update your yt-dlp
 ```
-pip install --user --update youtube-dl
+pip install --user --update yt-dlp
 ```
 
 
@@ -187,11 +177,9 @@ subtube play -h "firefox --headless"
 to play with custom handler. Each handler call wont block execution (ran in background).
 
 ### add
-adds new subscribed channel.
-This is link of channel's videos page (we parse that page so it needs to be videos tab)
-
+adds new subscribed channel. This is a link of a channel's page.
 ```
-subtube add "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw/videos"
+subtube add "https://www.youtube.com/@3blue1brown"
 ```
 
 ### clean
